@@ -1,0 +1,17 @@
+{
+  "name": "henil-patel-portfolio",
+  "version": "1.0.0",
+  "description": "Henil Patel — Electronics Engineering & Hardware Prototyping Portfolio",
+  "main": "serve.js",
+  "scripts": {
+    "start": "node serve.js"
+  },
+  "keywords": [
+    "portfolio",
+    "electronics",
+    "hardware",
+    "solidworks"
+  ],
+  "author": "Henil Patel",
+  "license": "MIT"
+}

@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Defense &amp; Peer Reviews // Henil Patel</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Fraunces', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            accent: {
+              DEFAULT: 'var(--accent)',
+              soft: 'var(--accent-soft)',
+              glow: 'var(--accent-glow)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-canvas: #faf6f0;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f4eee2;
+      --border-subtle: #e5dcce;
+      --border-strong: #d2c4b0;
+      --text-primary: #1d1814;
+      --text-secondary: #483d33;
+      --text-muted: #786b5e;
+      --accent: #b47834;
+      --accent-soft: #f4ede2;
+      --accent-glow: rgba(180, 120, 52, 0.22);
+      --accent-rgb: 180, 120, 52;
+      --grid-line: rgba(180, 120, 52, 0.07);
+    }
+
+    [data-theme="blueprint"] {
+      --bg-canvas: #f6f8fb;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #eaf0f7;
+      --border-subtle: #d3dfed;
+      --border-strong: #b8ccdf;
+      --text-primary: #0f1f2e;
+      --text-secondary: #2b4257;
+      --text-muted: #5a748c;
+      --accent: #1a6b8a;
+      --accent-soft: #e2f0f7;
+      --accent-glow: rgba(26, 107, 138, 0.22);
+      --accent-rgb: 26, 107, 138;
+      --grid-line: rgba(26, 107, 138, 0.08);
+    }
+
+    [data-theme="verdigris"] {
+      --bg-canvas: #f6f8f5;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #e9f0e8;
+      --border-subtle: #d2ded0;
+      --border-strong: #b4c7b1;
+      --text-primary: #112015;
+      --text-secondary: #293d2e;
+      --text-muted: #57705d;
+      --accent: #2e7d5b;
+      --accent-soft: #e3f2ea;
+      --accent-glow: rgba(46, 125, 91, 0.22);
+      --accent-rgb: 46, 125, 91;
+      --grid-line: rgba(46, 125, 91, 0.08);
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .drafting-grid {
+      background-color: var(--bg-canvas);
+      background-image:
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .vintage-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 4px 18px -4px rgba(40, 30, 20, 0.05);
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .vintage-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 12px 30px -8px rgba(40, 30, 20, 0.1);
+    }
+
+    ::-webkit-scrollbar { width: 9px; }
+    ::-webkit-scrollbar-track { background: var(--bg-canvas); }
+    ::-webkit-scrollbar-thumb {
+      background: #cfc4b2;
+      border-radius: 9999px;
+      border: 2px solid var(--bg-canvas);
+    }
+  </style>
+</head>
+<body data-theme="brass" class="drafting-grid antialiased selection:bg-[#e8d5be] selection:text-[#382a1b]">
+
+  <!-- ==================== VINTAGE NAVBAR ==================== -->
+  <header class="sticky top-0 z-50 bg-[#faf6f0]/95 backdrop-blur-md border-b border-[#e5dcce] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3.5 group">
+        <div class="w-11 h-11 rounded-2xl bg-white border border-[#d9ccb9] flex items-center justify-center font-serif font-bold text-lg text-[#1d1814] shadow-sm group-hover:border-accent transition-all">
+          HP<span class="text-accent">.</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="font-serif font-bold text-lg text-[#1d1814] tracking-tight leading-none">Henil Patel</span>
+            <span class="px-2 py-0.5 rounded-full bg-[#eef6f0] text-emerald-800 border border-emerald-200 font-mono text-[9px] font-bold">ONLINE</span>
+          </div>
+          <span class="font-mono text-[11px] text-[#786b5e] tracking-wider mt-0.5 hidden sm:inline">HP.LAB // DEFENSE &amp; REVIEWS</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center gap-2 bg-[#f4eee2]/80 p-1.5 rounded-2xl border border-[#e5dcce]">
+        <a href="index.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all">
+          00 // COMMAND DECK
+        </a>
+        <a href="projects.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all">
+          01 // 3D PROJECTS LAB
+        </a>
+        <a href="certificates.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all flex items-center gap-2 relative">
+          <span>02 // CERTIFICATE VAULT</span>
+          <span class="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[10px] font-extrabold">8</span>
+        </a>
+        <a href="feedback.html" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#1d1814] text-white shadow-sm transition-all flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-accent"></span>
+          <span>03 // DEFENSE &amp; REVIEWS</span>
+        </a>
+      </nav>
+
+      <!-- Palette Switcher & Mobile Menu Toggle -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center p-1 rounded-xl bg-white border border-[#ded4c3] shadow-sm">
+          <button type="button" data-set-theme="brass" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all bg-[#faf6f0] text-[#1d1814]">Brass</button>
+          <button type="button" data-set-theme="blueprint" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814]">Blueprint</button>
+          <button type="button" data-set-theme="verdigris" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814]">Verdigris</button>
+        </div>
+
+        <button id="mobileMenuToggle" type="button" class="lg:hidden p-2.5 rounded-xl bg-white border border-[#ded4c3] text-[#1d1814]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileNavMenu" class="hidden lg:hidden border-t border-[#e5dcce] bg-[#faf6f0] px-4 py-4 space-y-2">
+      <a href="index.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce]">00 // COMMAND DECK</a>
+      <a href="projects.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce]">01 // 3D PROJECTS LAB</a>
+      <a href="certificates.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce] flex items-center justify-between">
+        <span>02 // CERTIFICATE VAULT</span>
+        <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[10px] font-bold">8</span>
+      </a>
+      <a href="feedback.html" class="block px-4 py-3 rounded-xl bg-[#1d1814] text-white font-mono text-xs font-bold">03 // DEFENSE &amp; REVIEWS</a>
+    </div>
+  </header>
+
+  <!-- ==================== CLASSROOM DEFENSE & PEER REVIEWS ==================== -->
+  <main class="py-12 sm:py-20 border-b border-[#e5dcce]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Header Title & Live Scoreboard -->
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#d6c7b1] font-mono text-xs uppercase tracking-widest text-accent font-semibold mb-3">
+            03 // CLASSROOM DEFENSE &amp; EVALUATION
+          </div>
+          <h1 class="font-serif text-3xl sm:text-5xl font-bold text-[#1d1814] tracking-tight">
+            Peer Reviews &amp; Grading Scoreboard
+          </h1>
+          <p class="text-sm sm:text-base text-[#483d33] mt-2 max-w-2xl">
+            Live interactive evaluation for classroom presentations, capstone defenses, and faculty feedback. Evaluator names and star ratings are permanently recorded.
+          </p>
+        </div>
+
+        <!-- Live Scoreboard Summary Badge -->
+        <div class="vintage-card rounded-2xl p-5 bg-white border border-[#d9ccb9] flex items-center gap-5 shrink-0 shadow-sm">
+          <div class="text-center border-r border-[#e5dcce] pr-5">
+            <div id="avgRatingDisplay" class="font-serif font-bold text-4xl text-[#1d1814] leading-none">
+              5.0
+            </div>
+            <div class="text-amber-500 text-sm mt-1">★★★★★</div>
+          </div>
+          <div>
+            <div class="font-mono text-xs font-bold text-[#1d1814] uppercase">DEFENSE SCOREBOARD</div>
+            <div id="totalReviewsCountText" class="text-xs text-[#786b5e] font-mono mt-0.5">
+              3 peer evaluations recorded
+            </div>
+            <div class="flex items-center gap-1.5 mt-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span class="text-[10px] font-mono text-emerald-800 font-bold">LIVE PERSISTENCE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Two-Column Layout: Submit Form & Reviews Feed -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+        <!-- Left Column: Interactive Evaluation Form -->
+        <div class="lg:col-span-5">
+          <div class="vintage-card rounded-3xl p-7 sm:p-8 bg-white border-2 border-[#d9cdba] shadow-sm sticky top-28">
+            <div class="flex items-center justify-between pb-4 mb-5 border-b border-[#e5dcce]">
+              <div>
+                <h2 class="font-serif text-xl font-bold text-[#1d1814]">Log Evaluation</h2>
+                <p class="text-xs text-[#786b5e] font-mono mt-0.5">Enter your name and star rating</p>
+              </div>
+              <span class="w-8 h-8 rounded-xl bg-[#faf6f0] border border-[#d6c7b1] flex items-center justify-center text-accent font-serif font-bold">
+                ✎
+              </span>
+            </div>
+
+            <form id="evaluationForm" class="space-y-4">
+              <!-- Evaluator Name -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="evaluatorName" class="block text-xs font-mono uppercase tracking-wider text-[#483d33] font-bold">
+                    Your Full Name *
+                  </label>
+                  <span class="text-[10px] font-mono text-[#8c7d6b]">(Or leave blank for "Unknown Visitor")</span>
+                </div>
+                <input
+                  id="evaluatorName"
+                  type="text"
+                  placeholder="e.g. Prof. R. K. Sharma / Classmate / Friend Name"
+                  class="w-full px-4 py-2.5 rounded-xl bg-[#faf6f0] border border-[#d6c7b1] text-sm text-[#1d1814] placeholder-[#9d8e7e] focus:outline-none focus:border-accent focus:bg-white transition-all shadow-inner font-sans"
+                />
+                <p id="evaluatorNameError" class="hidden text-xs text-rose-600 mt-1 font-medium">Please enter your name.</p>
+              </div>
+
+              <!-- Role Selector -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="evaluatorRole" class="block text-xs font-mono uppercase tracking-wider text-[#483d33] font-bold mb-1.5">
+                    Your Role / Relationship
+                  </label>
+                  <select
+                    id="evaluatorRole"
+                    class="w-full px-3 py-2.5 rounded-xl bg-[#faf6f0] border border-[#d6c7b1] text-xs text-[#1d1814] focus:outline-none focus:border-accent focus:bg-white transition-all font-mono"
+                  >
+                    <option value="Classmate / Peer">Classmate / Peer</option>
+                    <option value="Faculty / Professor">Faculty / Professor</option>
+                    <option value="Friend / Personal Connection">👥 Friend / Personal Connection</option>
+                    <option value="Unknown Visitor / Guest">🌐 Unknown Visitor / Guest</option>
+                    <option value="Lab Reviewer">Lab Reviewer</option>
+                    <option value="Industry Recruiter">Industry Recruiter</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="evaluatorTopic" class="block text-xs font-mono uppercase tracking-wider text-[#483d33] font-bold mb-1.5">
+                    Evaluated Area
+                  </label>
+                  <select
+                    id="evaluatorTopic"
+                    class="w-full px-3 py-2.5 rounded-xl bg-[#faf6f0] border border-[#d6c7b1] text-xs text-[#1d1814] focus:outline-none focus:border-accent focus:bg-white transition-all font-mono"
+                  >
+                    <option value="Fan Cleaning Robot (3D Model)">Fan Robot (3D Model)</option>
+                    <option value="Friendly Wishes &amp; Encouragement">Friendly Wishes &amp; Encouragement</option>
+                    <option value="CAD &amp; SOLIDWORKS 2024">CAD &amp; SOLIDWORKS</option>
+                    <option value="C &amp; Embedded Firmware">C &amp; Embedded Logic</option>
+                    <option value="AI &amp; Machine Learning">AI Foundations</option>
+                    <option value="General Portfolio Feedback">General Portfolio Feedback</option>
+                    <option value="Entire Portfolio &amp; Defense">Entire Portfolio</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Interactive 5-Star Selector -->
+              <div>
+                <label class="block text-xs font-mono uppercase tracking-wider text-[#483d33] font-bold mb-1.5">
+                  Star Rating (1 to 5 Stars) *
+                </label>
+                <div class="p-3 rounded-2xl bg-[#faf6f0] border border-[#d6c7b1] flex items-center justify-between">
+                  <div id="starButtonGroup" class="flex items-center gap-1.5">
+                    <!-- Populated via script -->
+                  </div>
+                  <input type="hidden" id="selectedStarValue" value="5" />
+                  <span id="starScoreValueBadge" class="font-mono text-sm font-bold text-[#1d1814] px-2 py-0.5 rounded-lg bg-white border border-[#d6c7b1]">
+                    5 / 5
+                  </span>
+                </div>
+                <p id="starRatingDescription" class="text-[11px] text-[#786b5e] font-mono mt-1 italic">
+                  ★★★★★ 5 / 5 Stars — Outstanding Hardware Prototyping &amp; Leadership!
+                </p>
+              </div>
+
+              <!-- Remarks -->
+              <div>
+                <label for="evaluatorComment" class="block text-xs font-mono uppercase tracking-wider text-[#483d33] font-bold mb-1.5">
+                  Evaluation Remarks *
+                </label>
+                <textarea
+                  id="evaluatorComment"
+                  rows="3"
+                  required
+                  placeholder="Share constructive feedback on Henil's circuit engineering, CAD modeling, or presentation delivery..."
+                  class="w-full px-4 py-2.5 rounded-xl bg-[#faf6f0] border border-[#d6c7b1] text-xs sm:text-sm text-[#1d1814] placeholder-[#9d8e7e] focus:outline-none focus:border-accent focus:bg-white transition-all resize-none shadow-inner font-sans"
+                ></textarea>
+                <p id="evaluatorCommentError" class="hidden text-xs text-rose-600 mt-1 font-medium">Please enter constructive remarks (minimum 10 characters).</p>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="w-full py-3.5 rounded-2xl font-mono text-xs font-bold bg-[#1d1814] text-white hover:bg-[#332b24] shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+              >
+                <span>RECORD DEFENSE EVALUATION</span>
+                <span class="text-accent">★</span>
+              </button>
+
+              <div id="feedbackSuccessAlert" class="hidden p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs flex items-center gap-2 font-mono">
+                <span>✓</span> Evaluation logged to scoreboard and saved to local storage!
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right Column: Live Reviews Feed -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-[#e5dcce]">
+            <h2 class="font-serif text-xl font-bold text-[#1d1814]">
+              Recorded Evaluations &amp; Reviews
+            </h2>
+            <button
+              id="resetFeedbackBtn"
+              type="button"
+              class="text-[11px] font-mono text-[#786b5e] hover:text-[#1d1814] underline"
+            >
+              Reset to Defaults
+            </button>
+          </div>
+
+          <!-- Feedback Section Categories / Filter Tabs -->
+          <div class="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-[#f4eee2] border border-[#e2d5c1] text-xs font-mono">
+            <button
+              type="button"
+              data-feed-filter="all"
+              class="feedback-tab-btn active px-3.5 py-1.5 rounded-xl font-bold bg-[#1d1814] text-white shadow-xs transition-all flex items-center gap-1.5"
+            >
+              <span>All Reviews</span>
+              <span id="tabCountAll" class="px-1.5 py-0.2 rounded-full bg-white/20 text-[10px]">5</span>
+            </button>
+            <button
+              type="button"
+              data-feed-filter="friend"
+              class="feedback-tab-btn px-3.5 py-1.5 rounded-xl font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/70 transition-all flex items-center gap-1.5"
+            >
+              <span>👥 Friend Section</span>
+              <span id="tabCountFriend" class="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px]">1</span>
+            </button>
+            <button
+              type="button"
+              data-feed-filter="academic"
+              class="feedback-tab-btn px-3.5 py-1.5 rounded-xl font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/70 transition-all flex items-center gap-1.5"
+            >
+              <span>🎓 Faculty &amp; Peers</span>
+              <span id="tabCountAcademic" class="px-1.5 py-0.2 rounded-full bg-[#faf6f0] text-[#786b5e] border border-[#d6c7b1] text-[10px]">3</span>
+            </button>
+            <button
+              type="button"
+              data-feed-filter="visitor"
+              class="feedback-tab-btn px-3.5 py-1.5 rounded-xl font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/70 transition-all flex items-center gap-1.5"
+            >
+              <span>🌐 Unknown Visitors</span>
+              <span id="tabCountVisitor" class="px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-900 border border-sky-200 text-[10px]">1</span>
+            </button>
+          </div>
+
+          <!-- Active Filter Subtitle Info -->
+          <div id="feedbackFilterDesc" class="text-[11px] font-mono text-[#786b5e] flex items-center justify-between px-1">
+            <span>Showing all recorded reviews (Faculty, Friends &amp; Visitors).</span>
+            <span class="text-accent font-semibold">● Live Sync</span>
+          </div>
+
+          <!-- Feed Container -->
+          <div id="feedbackFeed" class="space-y-4">
+            <!-- Dynamically populated via script -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== DIRECT INQUIRY & CONTACT ==================== -->
+  <section class="py-14 sm:py-20 bg-white border-b border-[#e5dcce]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+        <div class="lg:col-span-5 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#faf6f0] border border-[#d6c7b1] font-mono text-xs uppercase tracking-widest text-accent font-semibold">
+            DIRECT COLLABORATION
+          </div>
+          <h2 class="font-serif text-3xl font-bold text-[#1d1814]">
+            Connect for Research &amp; Hardware Opportunities
+          </h2>
+          <p class="text-[#5c4e40] text-sm leading-relaxed">
+            Available for electronics engineering internships, embedded firmware projects, robotics research, or academic laboratory partnerships.
+          </p>
+
+          <!-- Direct Email One-Click Copy -->
+          <div class="vintage-card rounded-2xl p-4 flex items-center justify-between gap-3 bg-[#faf6f0]">
+            <div>
+              <div class="font-mono text-[10px] text-[#786b5e] uppercase font-bold">Email Address</div>
+              <div id="emailAddressText" class="text-sm font-bold text-[#1d1814]">henilpatel5523@gmail.com</div>
+            </div>
+            <button
+              id="copyEmailBtn"
+              type="button"
+              class="px-4 py-2 rounded-xl bg-[#1d1814] text-white font-mono text-xs font-bold hover:bg-[#382f26] transition-all"
+            >
+              Copy Email
+            </button>
+          </div>
+
+          <!-- Large External Links -->
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <a
+              href="https://github.com/HenilPatel5523-bit"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="p-4 rounded-2xl bg-[#faf6f0] border border-[#d6c7b1] hover:border-accent text-center font-mono text-xs font-bold text-[#1d1814] transition-all flex flex-col items-center gap-1.5"
+            >
+              <span class="text-base">⌨</span>
+              <span>GITHUB PROFILE ↗</span>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/henil-satishbhai-patel-785097449/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="p-4 rounded-2xl bg-[#faf6f0] border border-[#d6c7b1] hover:border-[#0a66c2] text-center font-mono text-xs font-bold text-[#1d1814] transition-all flex flex-col items-center gap-1.5"
+            >
+              <span class="text-base text-[#0a66c2]">in</span>
+              <span>LINKEDIN PROFILE ↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Contact Message Form -->
+        <div class="lg:col-span-7 vintage-card rounded-3xl p-7 sm:p-8 bg-[#faf6f0] border border-[#e5dcce]">
+          <h3 class="font-serif text-xl font-bold text-[#1d1814] mb-4">Send a Direct Message</h3>
+          <form id="contactMessageForm" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="contactSender" class="block text-xs font-mono uppercase text-[#483d33] font-bold mb-1">Your Name *</label>
+                <input id="contactSender" type="text" required placeholder="Dr. Arthur Vance" class="w-full px-4 py-2.5 rounded-xl bg-white border border-[#d6c7b1] text-xs sm:text-sm text-[#1d1814] focus:outline-none focus:border-accent" />
+              </div>
+              <div>
+                <label for="contactEmail" class="block text-xs font-mono uppercase text-[#483d33] font-bold mb-1">Email Address *</label>
+                <input id="contactEmail" type="email" required placeholder="name@institution.edu" class="w-full px-4 py-2.5 rounded-xl bg-white border border-[#d6c7b1] text-xs sm:text-sm text-[#1d1814] focus:outline-none focus:border-accent" />
+              </div>
+            </div>
+            <div>
+              <label for="contactSubject" class="block text-xs font-mono uppercase text-[#483d33] font-bold mb-1">Inquiry Topic</label>
+              <select id="contactSubject" class="w-full px-4 py-2.5 rounded-xl bg-white border border-[#d6c7b1] text-xs font-mono text-[#1d1814] focus:outline-none focus:border-accent">
+                <option value="Internship / Engineering Opportunity">Internship / Engineering Opportunity</option>
+                <option value="Robotics & Prototyping Collaboration">Robotics &amp; Prototyping Collaboration</option>
+                <option value="Circuit & Embedded Systems Research">Circuit &amp; Embedded Systems Research</option>
+              </select>
+            </div>
+            <div>
+              <label for="contactBody" class="block text-xs font-mono uppercase text-[#483d33] font-bold mb-1">Message *</label>
+              <textarea id="contactBody" rows="3" required placeholder="Project details or interview invitation..." class="w-full px-4 py-2.5 rounded-xl bg-white border border-[#d6c7b1] text-xs sm:text-sm text-[#1d1814] focus:outline-none focus:border-accent resize-none"></textarea>
+            </div>
+            <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#1d1814] text-white font-mono text-xs font-bold hover:bg-[#382f26] transition-all">
+              Transmit Message to Henil →
+            </button>
+            <div id="contactSentAlert" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-mono">
+              ✓ Message logged successfully. Henil Patel will reply promptly!
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="py-12 border-t border-[#e2d6c3] bg-[#f4eee2] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-[#ded3be]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white border border-[#d9ccb9] flex items-center justify-center font-serif font-bold text-base text-[#1d1814]">
+            HP<span class="text-accent">.</span>
+          </div>
+          <div>
+            <div class="font-serif font-bold text-base text-[#1d1814]">Henil Patel</div>
+            <div class="font-mono text-xs text-[#786b5e]">Electronics Engineering &amp; Hardware Prototyping</div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-5 font-mono text-xs font-semibold text-[#483d33]">
+          <a href="index.html" class="hover:text-accent transition-colors">00 // Command Deck</a>
+          <a href="projects.html" class="hover:text-accent transition-colors">01 // 3D Projects Lab</a>
+          <a href="certificates.html" class="hover:text-accent transition-colors">02 // Certificate Vault</a>
+          <a href="feedback.html" class="text-accent">03 // Defense &amp; Reviews</a>
+        </div>
+      </div>
+
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#786b5e] font-mono">
+        <div>&copy; 2026 HENIL PATEL // HP.LAB // VINTAGE WORKSTATION EDITION</div>
+        <div>HOSTED ON LOCAL WORKSPACE // KARNAVATI UNIVERSITY</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== FEEDBACK & REVIEWS ENGINE ==================== -->
+  <script>
+    (function () {
+      /* 1. Theme Switcher */
+      const currentTheme = localStorage.getItem('henil_theme') || 'brass';
+      document.body.setAttribute('data-theme', currentTheme);
+
+      const themeButtons = document.querySelectorAll('[data-set-theme]');
+      function updateThemeButtons(theme) {
+        themeButtons.forEach((btn) => {
+          const t = btn.getAttribute('data-set-theme');
+          if (t === theme) {
+            btn.className = 'theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all bg-[#faf6f0] text-[#1d1814] shadow-xs';
+          } else {
+            btn.className = 'theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814] transition-all';
+          }
+        });
+      }
+      updateThemeButtons(currentTheme);
+
+      themeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const selected = btn.getAttribute('data-set-theme');
+          document.body.setAttribute('data-theme', selected);
+          localStorage.setItem('henil_theme', selected);
+          updateThemeButtons(selected);
+        });
+      });
+
+      /* Mobile Drawer */
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mobileNavMenu = document.getElementById('mobileNavMenu');
+      if (mobileMenuToggle && mobileNavMenu) {
+        mobileMenuToggle.addEventListener('click', () => {
+          mobileNavMenu.classList.toggle('hidden');
+        });
+      }
+
+      /* 2. Interactive Star Selector */
+      const starButtonGroup = document.getElementById('starButtonGroup');
+      const selectedStarValue = document.getElementById('selectedStarValue');
+      const starScoreValueBadge = document.getElementById('starScoreValueBadge');
+      const starRatingDescription = document.getElementById('starRatingDescription');
+
+      const starDescriptions = {
+        1: '★☆☆☆☆ 1 / 5 Stars — Needs Conceptual Hardware Revision',
+        2: '★★☆☆☆ 2 / 5 Stars — Fair Foundation, Needs Further Iteration',
+        3: '★★★☆☆ 3 / 5 Stars — Good Electromechanical Concept & Execution',
+        4: '★★★★☆ 4 / 5 Stars — Very Strong Engineering Prototyping',
+        5: '★★★★★ 5 / 5 Stars — Outstanding Hardware Prototyping & Leadership!'
+      };
+
+      let currentSelectedStar = 5;
+      let currentHoverStar = 0;
+
+      function renderStarSelector() {
+        starButtonGroup.innerHTML = [1, 2, 3, 4, 5].map((val) => {
+          const isFilled = (currentHoverStar || currentSelectedStar) >= val;
+          return `
+            <button
+              type="button"
+              data-star="${val}"
+              class="star-btn p-1 text-2xl focus:outline-none transition-transform hover:scale-125"
+              aria-label="Rate ${val} star${val > 1 ? 's' : ''}"
+            >
+              <span class="${isFilled ? 'text-amber-500 fill-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]' : 'text-[#d6c7b1]'}">★</span>
+            </button>
+          `;
+        }).join('');
+
+        starButtonGroup.querySelectorAll('.star-btn').forEach((btn) => {
+          btn.addEventListener('mouseenter', () => {
+            currentHoverStar = parseInt(btn.getAttribute('data-star'));
+            renderStarSelector();
+            starRatingDescription.textContent = starDescriptions[currentHoverStar];
+          });
+          btn.addEventListener('click', () => {
+            currentSelectedStar = parseInt(btn.getAttribute('data-star'));
+            selectedStarValue.value = currentSelectedStar;
+            starScoreValueBadge.textContent = `${currentSelectedStar} / 5`;
+            currentHoverStar = 0;
+            renderStarSelector();
+            starRatingDescription.textContent = starDescriptions[currentSelectedStar];
+          });
+        });
+
+        starButtonGroup.addEventListener('mouseleave', () => {
+          currentHoverStar = 0;
+          renderStarSelector();
+          starRatingDescription.textContent = starDescriptions[currentSelectedStar];
+        });
+      }
+
+      renderStarSelector();
+
+      /* 3. Default Peer, Faculty, Friend & Visitor Evaluations */
+      const defaultReviews = [
+        {
+          id: 1,
+          name: 'Prof. K. R. Mehta',
+          role: 'Faculty / Professor',
+          topic: 'Fan Cleaning Robot (3D Model)',
+          category: 'faculty',
+          stars: 5,
+          comment: 'Exceptional electromechanical presentation by Henil Patel. The automatic rodless clamp architecture and counter-rotating microfiber roller design solve an authentic high-risk household issue. Well-structured CAD engineering and clear leadership.',
+          date: 'Nov 17, 2026'
+        },
+        {
+          id: 2,
+          name: 'Aarav V. Sharma',
+          role: 'Classmate / Peer',
+          topic: 'Fan Cleaning Robot (3D Model)',
+          category: 'peer',
+          stars: 5,
+          comment: 'The 3D model demonstration was the highlight of our lab session. Henil\'s explanation of the H-bridge motor driver circuitry and lateral guide wheels showed true hands-on team leadership.',
+          date: 'Nov 17, 2026'
+        },
+        {
+          id: 3,
+          name: 'Pooja Trivedi',
+          role: 'Lab Reviewer',
+          topic: 'C & Embedded Logic',
+          category: 'faculty',
+          stars: 5,
+          comment: 'Thorough understanding of embedded register operations and PWM driver control. High attention to mechanical tolerances and systematic breadboard debugging.',
+          date: 'Nov 16, 2026'
+        },
+        {
+          id: 4,
+          name: 'Dhruv Parekh',
+          role: 'Friend / Personal Connection',
+          topic: 'Friendly Wishes & Encouragement',
+          category: 'friend',
+          stars: 5,
+          comment: 'Known Henil for years — his dedication to electronics and late-night soldering sessions is unmatched. The 3D robot model looks incredible. Keep inspiring everyone bro! 🔥',
+          date: 'Nov 18, 2026'
+        },
+        {
+          id: 5,
+          name: 'Unknown Visitor',
+          role: 'Unknown Visitor / Guest',
+          topic: 'General Portfolio Feedback',
+          category: 'visitor',
+          stars: 5,
+          comment: 'Stumbled upon this portfolio from LinkedIn. The interactive 3D robot model and clean drafting layout are super impressive. Great work on the hardware documentation!',
+          date: 'Nov 20, 2026'
+        }
+      ];
+
+      let currentFeedbackFilter = 'all';
+
+      function loadReviews() {
+        try {
+          const stored = localStorage.getItem('henil_feedback_reviews');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {}
+        return [...defaultReviews];
+      }
+
+      let currentReviews = loadReviews();
+
+      // Sync with server API
+      function syncReviewsApi() {
+        fetch('/api/reviews')
+          .then(res => {
+            if (!res.ok) throw new Error('API unavailable');
+            return res.json();
+          })
+          .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+              currentReviews = data;
+              try {
+                localStorage.setItem('henil_feedback_reviews', JSON.stringify(currentReviews));
+              } catch (e) {}
+              renderReviews();
+            }
+          })
+          .catch(() => {});
+      }
+      syncReviewsApi();
+
+      function getInitials(name) {
+        const parts = name.trim().split(/\s+/);
+        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+
+      function renderStarGlyphs(count) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+          if (i <= count) {
+            stars += `<span class="text-amber-500 font-bold">★</span>`;
+          } else {
+            stars += `<span class="text-[#d9cdba]">★</span>`;
+          }
+        }
+        return stars;
+      }
+
+      const feedbackFeed = document.getElementById('feedbackFeed');
+      const avgRatingDisplay = document.getElementById('avgRatingDisplay');
+      const totalReviewsCountText = document.getElementById('totalReviewsCountText');
+      const feedbackFilterDesc = document.getElementById('feedbackFilterDesc');
+      const tabCountAll = document.getElementById('tabCountAll');
+      const tabCountFriend = document.getElementById('tabCountFriend');
+      const tabCountAcademic = document.getElementById('tabCountAcademic');
+      const tabCountVisitor = document.getElementById('tabCountVisitor');
+
+      document.querySelectorAll('.feedback-tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const filter = btn.getAttribute('data-feed-filter');
+          currentFeedbackFilter = filter;
+
+          document.querySelectorAll('.feedback-tab-btn').forEach((b) => {
+            b.classList.remove('active', 'bg-[#1d1814]', 'text-white', 'font-bold');
+            b.classList.add('font-semibold', 'text-[#5c4e40]');
+          });
+          btn.classList.add('active', 'bg-[#1d1814]', 'text-white', 'font-bold');
+          btn.classList.remove('font-semibold', 'text-[#5c4e40]');
+
+          if (feedbackFilterDesc) {
+            if (filter === 'friend') {
+              feedbackFilterDesc.innerHTML = `<span>Showing <strong class="text-[#1d1814]">Friend Section</strong> — personal notes &amp; peer feedback.</span><span class="text-accent font-semibold">● Friend Reviews</span>`;
+            } else if (filter === 'visitor') {
+              feedbackFilterDesc.innerHTML = `<span>Showing <strong class="text-[#1d1814]">Unknown &amp; Guest Visitors</strong> — feedback from public visitors.</span><span class="text-accent font-semibold">● Community</span>`;
+            } else if (filter === 'academic') {
+              feedbackFilterDesc.innerHTML = `<span>Showing <strong class="text-[#1d1814]">Faculty &amp; Classmate Evaluations</strong> — technical critiques.</span><span class="text-accent font-semibold">● Academic</span>`;
+            } else {
+              feedbackFilterDesc.innerHTML = `<span>Showing all recorded reviews (Faculty, Friends &amp; Visitors).</span><span class="text-accent font-semibold">● Live Sync</span>`;
+            }
+          }
+
+          renderReviews();
+        });
+      });
+
+      function renderReviews() {
+        const countAll = currentReviews.length;
+        const countFriend = currentReviews.filter(
+          (r) => r.category === 'friend' || (r.role && r.role.includes('Friend'))
+        ).length;
+        const countVisitor = currentReviews.filter(
+          (r) => r.category === 'visitor' || (r.role && (r.role.includes('Unknown') || r.role.includes('Visitor') || r.role.includes('Guest')))
+        ).length;
+        const countAcademic = currentReviews.filter(
+          (r) => r.category === 'faculty' || r.category === 'peer' || (r.role && (r.role.includes('Faculty') || r.role.includes('Classmate') || r.role.includes('Lab') || r.role.includes('Peer') || r.role.includes('Recruiter')))
+        ).length;
+
+        if (tabCountAll) tabCountAll.textContent = countAll;
+        if (tabCountFriend) tabCountFriend.textContent = countFriend;
+        if (tabCountVisitor) tabCountVisitor.textContent = countVisitor;
+        if (tabCountAcademic) tabCountAcademic.textContent = countAcademic;
+
+        const totalStars = currentReviews.reduce((sum, r) => sum + r.stars, 0);
+        const avg = currentReviews.length > 0 ? (totalStars / currentReviews.length).toFixed(1) : '5.0';
+        if (avgRatingDisplay) avgRatingDisplay.textContent = avg;
+        if (totalReviewsCountText) {
+          totalReviewsCountText.textContent = `${currentReviews.length} total review${currentReviews.length === 1 ? '' : 's'} (Faculty, Friends & Visitors)`;
+        }
+
+        let filteredReviews = currentReviews;
+        if (currentFeedbackFilter === 'friend') {
+          filteredReviews = currentReviews.filter(
+            (r) => r.category === 'friend' || (r.role && r.role.includes('Friend'))
+          );
+        } else if (currentFeedbackFilter === 'visitor') {
+          filteredReviews = currentReviews.filter(
+            (r) => r.category === 'visitor' || (r.role && (r.role.includes('Unknown') || r.role.includes('Visitor') || r.role.includes('Guest')))
+          );
+        } else if (currentFeedbackFilter === 'academic') {
+          filteredReviews = currentReviews.filter(
+            (r) => !r.role.includes('Friend') && !r.role.includes('Unknown') && !r.role.includes('Visitor')
+          );
+        }
+
+        if (filteredReviews.length === 0) {
+          feedbackFeed.innerHTML = `
+            <div class="vintage-card rounded-2xl p-8 text-center border border-[#dfd3c0] bg-white">
+              <span class="text-3xl mb-2 block">💬</span>
+              <h4 class="font-serif font-bold text-base text-[#1d1814]">No reviews yet in this section</h4>
+              <p class="text-xs text-[#786b5e] mt-1 max-w-sm mx-auto">
+                Be the first to share your thoughts! Use the form on the left to submit feedback.
+              </p>
+            </div>
+          `;
+          return;
+        }
+
+        feedbackFeed.innerHTML = filteredReviews.map((rev) => {
+          const isFriend = rev.category === 'friend' || (rev.role && rev.role.includes('Friend'));
+          const isVisitor = rev.category === 'visitor' || (rev.role && (rev.role.includes('Unknown') || rev.role.includes('Visitor') || rev.role.includes('Guest')));
+          const isFaculty = rev.category === 'faculty' || (rev.role && (rev.role.includes('Faculty') || rev.role.includes('Professor')));
+
+          let badgeHtml = '';
+          if (isFriend) {
+            badgeHtml = `<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-300 font-mono text-[9px] font-bold">★ FRIEND SECTION</span>`;
+          } else if (isVisitor) {
+            badgeHtml = `<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 font-mono text-[9px] font-bold">🌐 UNKNOWN VISITOR</span>`;
+          } else if (isFaculty) {
+            badgeHtml = `<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200 font-mono text-[9px] font-bold">🎓 FACULTY EVALUATOR</span>`;
+          } else {
+            badgeHtml = `<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#eef6f0] text-emerald-800 border border-emerald-200 font-mono text-[9px] font-bold">VERIFIED EVALUATOR</span>`;
+          }
+
+          const avatarBg = isFriend
+            ? 'bg-amber-50 border-amber-300 text-amber-900'
+            : isVisitor
+            ? 'bg-sky-50 border-sky-200 text-sky-900'
+            : 'bg-[#faf6f0] border-[#d9ccb9] text-accent';
+
+          const avatarContent = isVisitor && (!rev.name || rev.name.toLowerCase().includes('unknown'))
+            ? '👤'
+            : getInitials(rev.name);
+
+          return `
+            <div class="vintage-card rounded-2xl p-5 sm:p-6 bg-white border ${isFriend ? 'border-amber-200 hover:border-amber-400' : 'border-[#dfd3c0] hover:border-accent'} shadow-xs transition-all">
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-xl ${avatarBg} border font-serif font-bold text-sm flex items-center justify-center shrink-0 shadow-inner">
+                    ${avatarContent}
+                  </div>
+                  <div>
+                    <h4 class="font-serif font-bold text-base text-[#1d1814] flex items-center gap-2">
+                      <span>${rev.name}</span>
+                      ${badgeHtml}
+                    </h4>
+                    <span class="inline-block px-2 py-0.5 rounded-md bg-[#f4eee2] text-[#6b5a49] font-mono text-[10px] font-semibold mt-0.5">
+                      ${rev.role}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 shrink-0 bg-[#faf6f0] px-3 py-1.5 rounded-xl border border-[#e2d5c1] shadow-inner">
+                  <div class="flex text-sm leading-none">
+                    ${renderStarGlyphs(rev.stars)}
+                  </div>
+                  <span class="font-mono text-xs font-bold text-[#1d1814] ml-1">${rev.stars}/5</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between text-[11px] font-mono text-[#8c7d6b] my-2.5 pt-2 border-t border-[#f4ede0]">
+                <span class="text-accent font-semibold">◈ ${rev.topic}</span>
+                <span>${rev.date}</span>
+              </div>
+
+              <p class="text-xs sm:text-sm text-[#483d33] leading-relaxed italic bg-[#faf6f0]/70 p-3.5 rounded-xl border border-[#ece1cf]">
+                "${rev.comment}"
+              </p>
+            </div>
+          `;
+        }).join('');
+      }
+
+      renderReviews();
+
+      /* 4. Form Submission */
+      const evaluationForm = document.getElementById('evaluationForm');
+      const evaluatorName = document.getElementById('evaluatorName');
+      const evaluatorRole = document.getElementById('evaluatorRole');
+      const evaluatorTopic = document.getElementById('evaluatorTopic');
+      const evaluatorComment = document.getElementById('evaluatorComment');
+      const evaluatorNameError = document.getElementById('evaluatorNameError');
+      const evaluatorCommentError = document.getElementById('evaluatorCommentError');
+      const feedbackSuccessAlert = document.getElementById('feedbackSuccessAlert');
+
+      evaluationForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let valid = true;
+
+        let name = evaluatorName.value.trim();
+        const comment = evaluatorComment.value.trim();
+        const role = evaluatorRole.value;
+
+        if (!name) {
+          if (role.includes('Friend')) {
+            name = 'Friend of Henil';
+          } else if (role.includes('Unknown') || role.includes('Visitor')) {
+            name = 'Unknown Visitor';
+          } else {
+            name = 'Unknown Guest';
+          }
+        }
+
+        if (comment.length < 5) {
+          evaluatorCommentError.classList.remove('hidden');
+          valid = false;
+        } else {
+          evaluatorCommentError.classList.add('hidden');
+        }
+
+        if (!valid) return;
+
+        let category = 'peer';
+        if (role.includes('Friend')) category = 'friend';
+        else if (role.includes('Unknown') || role.includes('Visitor')) category = 'visitor';
+        else if (role.includes('Faculty') || role.includes('Professor')) category = 'faculty';
+
+        const newReview = {
+          id: Date.now(),
+          name: name,
+          role: role,
+          topic: evaluatorTopic.value,
+          category: category,
+          stars: parseInt(selectedStarValue.value) || 5,
+          comment: comment,
+          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        };
+
+        currentReviews.unshift(newReview);
+        try {
+          localStorage.setItem('henil_feedback_reviews', JSON.stringify(currentReviews));
+        } catch (e) {}
+
+        fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newReview)
+        }).catch(() => {});
+
+        renderReviews();
+
+        evaluatorName.value = '';
+        evaluatorComment.value = '';
+        currentSelectedStar = 5;
+        selectedStarValue.value = '5';
+        starScoreValueBadge.textContent = '5 / 5';
+        renderStarSelector();
+
+        feedbackSuccessAlert.classList.remove('hidden');
+        setTimeout(() => {
+          feedbackSuccessAlert.classList.add('hidden');
+        }, 5000);
+      });
+
+      const resetFeedbackBtn = document.getElementById('resetFeedbackBtn');
+      if (resetFeedbackBtn) {
+        resetFeedbackBtn.addEventListener('click', () => {
+          if (confirm('Reset evaluations back to default reviews?')) {
+            currentReviews = [...defaultReviews];
+            try {
+              localStorage.setItem('henil_feedback_reviews', JSON.stringify(currentReviews));
+            } catch (e) {}
+            fetch('/api/reviews/reset', { method: 'POST' }).catch(() => {});
+            renderReviews();
+          }
+        });
+      }
+        feedbackSuccessAlert.classList.remove('hidden');
+        setTimeout(() => { feedbackSuccessAlert.classList.add('hidden'); }, 4000);
+      });
+
+      /* Reset Button */
+      const resetFeedbackBtn = document.getElementById('resetFeedbackBtn');
+      resetFeedbackBtn.addEventListener('click', () => {
+        if (confirm('Reset defense scoreboard to initial reviews?')) {
+          currentReviews = [...defaultReviews];
+          localStorage.removeItem('henil_feedback_reviews');
+          renderReviews();
+        }
+      });
+
+      /* 5. Contact Copy Button */
+      const copyEmailBtn = document.getElementById('copyEmailBtn');
+      copyEmailBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText('henilpatel5523@gmail.com');
+        copyEmailBtn.textContent = 'Copied!';
+        setTimeout(() => { copyEmailBtn.textContent = 'Copy Email'; }, 2000);
+      });
+
+      /* Contact Form Dummy Send */
+      const contactMessageForm = document.getElementById('contactMessageForm');
+      const contactSentAlert = document.getElementById('contactSentAlert');
+      contactMessageForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        contactSentAlert.classList.remove('hidden');
+        contactMessageForm.reset();
+        setTimeout(() => { contactSentAlert.classList.add('hidden'); }, 4000);
+      });
+
+    })();
+  </script>
+</body>
+</html>

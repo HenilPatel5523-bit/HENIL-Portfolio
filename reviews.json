@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1795540605181,
+    "name": "Unknown Reviewer",
+    "role": "Unknown Visitor / Guest",
+    "topic": "Fan Cleaning Robot (3D Model)",
+    "category": "visitor",
+    "stars": 5,
+    "comment": "Testing visitor review submission from browser",
+    "date": "Nov 24, 2026"
+  },
+  {
+    "id": 1,
+    "name": "Prof. K. R. Mehta",
+    "role": "Faculty / Professor",
+    "topic": "Fan Cleaning Robot (3D Model)",
+    "category": "faculty",
+    "stars": 5,
+    "comment": "Exceptional electromechanical presentation by Henil Patel. The automatic rodless clamp architecture and counter-rotating microfiber roller design solve an authentic high-risk household issue. Well-structured CAD engineering and clear leadership.",
+    "date": "Nov 17, 2026"
+  },
+  {
+    "id": 2,
+    "name": "Aarav V. Sharma",
+    "role": "Classmate / Peer",
+    "topic": "Fan Cleaning Robot (3D Model)",
+    "category": "peer",
+    "stars": 5,
+    "comment": "The 3D model demonstration was the highlight of our lab session. Henil's explanation of the H-bridge motor driver circuitry and lateral guide wheels showed true hands-on team leadership.",
+    "date": "Nov 17, 2026"
+  },
+  {
+    "id": 3,
+    "name": "Pooja Trivedi",
+    "role": "Lab Reviewer",
+    "topic": "Circuit & Network Analysis",
+    "category": "faculty",
+    "stars": 5,
+    "comment": "Thorough understanding of Star-Delta derivations and multi-loop nodal equations. High attention to hardware tolerances and systematic breadboard debugging.",
+    "date": "Nov 16, 2026"
+  },
+  {
+    "id": 4,
+    "name": "Dhruv Parekh",
+    "role": "Friend / Personal Connection",
+    "topic": "Friendly Wishes & Personal Feedback",
+    "category": "friend",
+    "stars": 5,
+    "comment": "Known Henil for years — his dedication to electronics and late-night soldering sessions is unmatched. The 3D robot model looks incredible. Keep inspiring everyone bro! 🔥",
+    "date": "Nov 18, 2026"
+  },
+  {
+    "id": 5,
+    "name": "Unknown Visitor",
+    "role": "Unknown Visitor / Guest",
+    "topic": "General Portfolio Feedback",
+    "category": "visitor",
+    "stars": 5,
+    "comment": "Stumbled upon this portfolio from LinkedIn. The interactive 3D robot model and clean drafting layout are super impressive. Great work on the hardware documentation!",
+    "date": "Nov 20, 2026"
+  }
+]

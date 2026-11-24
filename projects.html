@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Projects Lab // Henil Patel</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Three.js CDN for procedural 360° WebGL simulation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Fraunces', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            accent: {
+              DEFAULT: 'var(--accent)',
+              soft: 'var(--accent-soft)',
+              glow: 'var(--accent-glow)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-canvas: #faf6f0;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f4eee2;
+      --border-subtle: #e5dcce;
+      --border-strong: #d2c4b0;
+      --text-primary: #1d1814;
+      --text-secondary: #483d33;
+      --text-muted: #786b5e;
+      --accent: #b47834;
+      --accent-soft: #f4ede2;
+      --accent-glow: rgba(180, 120, 52, 0.22);
+      --accent-rgb: 180, 120, 52;
+      --grid-line: rgba(180, 120, 52, 0.07);
+    }
+
+    [data-theme="blueprint"] {
+      --bg-canvas: #f6f8fb;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #eaf0f7;
+      --border-subtle: #d3dfed;
+      --border-strong: #b8ccdf;
+      --text-primary: #0f1f2e;
+      --text-secondary: #2b4257;
+      --text-muted: #5a748c;
+      --accent: #1a6b8a;
+      --accent-soft: #e2f0f7;
+      --accent-glow: rgba(26, 107, 138, 0.22);
+      --accent-rgb: 26, 107, 138;
+      --grid-line: rgba(26, 107, 138, 0.08);
+    }
+
+    [data-theme="verdigris"] {
+      --bg-canvas: #f6f8f5;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #e9f0e8;
+      --border-subtle: #d2ded0;
+      --border-strong: #b4c7b1;
+      --text-primary: #112015;
+      --text-secondary: #293d2e;
+      --text-muted: #57705d;
+      --accent: #2e7d5b;
+      --accent-soft: #e3f2ea;
+      --accent-glow: rgba(46, 125, 91, 0.22);
+      --accent-rgb: 46, 125, 91;
+      --grid-line: rgba(46, 125, 91, 0.08);
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .drafting-grid {
+      background-color: var(--bg-canvas);
+      background-image:
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .vintage-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 4px 18px -4px rgba(40, 30, 20, 0.05);
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .vintage-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 12px 30px -8px rgba(40, 30, 20, 0.1), 0 0 0 1px var(--accent-glow);
+    }
+
+    /* 3D CAD Prototype Viewport */
+    .cad-viewport-stage {
+      perspective: 1200px;
+      user-select: none;
+    }
+    .cad-model-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: box-shadow 0.3s ease;
+    }
+    .cad-hotspot-pin {
+      transform-style: preserve-3d;
+      transform: translateZ(28px);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .cad-hotspot-pin:hover {
+      transform: translateZ(36px) scale(1.15);
+    }
+
+    ::-webkit-scrollbar { width: 9px; }
+    ::-webkit-scrollbar-track { background: var(--bg-canvas); }
+    ::-webkit-scrollbar-thumb {
+      background: #cfc4b2;
+      border-radius: 9999px;
+      border: 2px solid var(--bg-canvas);
+    }
+  </style>
+</head>
+<body data-theme="brass" class="drafting-grid antialiased selection:bg-[#e8d5be] selection:text-[#382a1b]">
+
+  <!-- ==================== VINTAGE NAVBAR ==================== -->
+  <header class="sticky top-0 z-50 bg-[#faf6f0]/95 backdrop-blur-md border-b border-[#e5dcce] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3.5 group">
+        <div class="w-11 h-11 rounded-2xl bg-white border border-[#d9ccb9] flex items-center justify-center font-serif font-bold text-lg text-[#1d1814] shadow-sm group-hover:border-accent transition-all">
+          HP<span class="text-accent">.</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="font-serif font-bold text-lg text-[#1d1814] tracking-tight leading-none">Henil Patel</span>
+            <span class="px-2 py-0.5 rounded-full bg-[#eef6f0] text-emerald-800 border border-emerald-200 font-mono text-[9px] font-bold">ONLINE</span>
+          </div>
+          <span class="font-mono text-[11px] text-[#786b5e] tracking-wider mt-0.5 hidden sm:inline">HP.LAB // 3D PROJECTS</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center gap-2 bg-[#f4eee2]/80 p-1.5 rounded-2xl border border-[#e5dcce]">
+        <a href="index.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all">
+          00 // COMMAND DECK
+        </a>
+        <a href="projects.html" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#1d1814] text-white shadow-sm transition-all flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-accent"></span>
+          <span>01 // 3D PROJECTS LAB</span>
+        </a>
+        <a href="certificates.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all flex items-center gap-2 relative">
+          <span>02 // CERTIFICATE VAULT</span>
+          <span class="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[10px] font-extrabold">8</span>
+        </a>
+        <a href="feedback.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all">
+          03 // DEFENSE &amp; REVIEWS
+        </a>
+      </nav>
+
+      <!-- Palette Switcher & Mobile Menu Toggle -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center p-1 rounded-xl bg-white border border-[#ded4c3] shadow-sm">
+          <button type="button" data-set-theme="brass" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all bg-[#faf6f0] text-[#1d1814]">Brass</button>
+          <button type="button" data-set-theme="blueprint" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814]">Blueprint</button>
+          <button type="button" data-set-theme="verdigris" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814]">Verdigris</button>
+        </div>
+
+        <button id="mobileMenuToggle" type="button" class="lg:hidden p-2.5 rounded-xl bg-white border border-[#ded4c3] text-[#1d1814]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileNavMenu" class="hidden lg:hidden border-t border-[#e5dcce] bg-[#faf6f0] px-4 py-4 space-y-2">
+      <a href="index.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce]">00 // COMMAND DECK</a>
+      <a href="projects.html" class="block px-4 py-3 rounded-xl bg-[#1d1814] text-white font-mono text-xs font-bold">01 // 3D PROJECTS LAB</a>
+      <a href="certificates.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce] flex items-center justify-between">
+        <span>02 // CERTIFICATE VAULT</span>
+        <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-mono text-[10px] font-bold">8</span>
+      </a>
+      <a href="feedback.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce]">03 // DEFENSE &amp; REVIEWS</a>
+    </div>
+  </header>
+
+  <!-- ==================== GRAND FLAGSHIP 3D CAD SHOWCASE ==================== -->
+  <main class="py-12 sm:py-20 border-b border-[#e5dcce]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Section Title Header -->
+      <div class="mb-10 sm:mb-14">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#d6c7b1] font-mono text-xs uppercase tracking-widest text-accent font-semibold mb-3">
+          01 // ELECTROMECHANICAL CAPSTONE
+        </div>
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 class="font-serif text-3xl sm:text-5xl font-bold text-[#1d1814] tracking-tight">
+              Automatic Rodless Ceiling Fan Cleaning Robot
+            </h1>
+            <p class="text-sm sm:text-base text-[#483d33] mt-2 max-w-2xl">
+              An autonomous, high-torque dual-roller electromechanical robot engineered to clamp onto suspended ceiling fan blades, clean particulates without external rods, and auto-reverse upon edge detection.
+            </p>
+          </div>
+          <!-- Viewport Mode Switcher Buttons -->
+          <div class="flex items-center gap-2 shrink-0 bg-white p-1 rounded-2xl border border-[#d6c7b1] shadow-xs">
+            <button
+              id="viewModePhotoBtn"
+              type="button"
+              class="px-4 py-2 rounded-xl font-mono text-xs font-bold bg-[#1d1814] text-white transition-all shadow-xs"
+            >
+              Mode A: 3D Photo &amp; Hotspots
+            </button>
+            <button
+              id="viewModeThreeBtn"
+              type="button"
+              class="px-4 py-2 rounded-xl font-mono text-xs font-semibold text-[#5c4e40] hover:text-[#1d1814] transition-all"
+            >
+              Mode B: 360° Live 3D Simulation
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flagship 3D Stage Console -->
+      <div class="vintage-card rounded-3xl p-6 sm:p-9 border-2 border-[#d9ccb9] mb-14 bg-white">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+          <!-- Left Column: The 3D Viewport -->
+          <div class="lg:col-span-7">
+            <div class="cad-viewport-stage relative w-full rounded-2xl bg-gradient-to-b from-[#f7f3ea] to-[#ede3d1] border border-[#ded3be] p-4 sm:p-6 shadow-inner flex flex-col items-center justify-center overflow-hidden min-h-[380px] sm:min-h-[460px]">
+
+              <!-- Stage Top Bar -->
+              <div class="w-full flex items-center justify-between pb-3 border-b border-[#ded3be] text-[11px] font-mono text-[#786b5e] z-10">
+                <span class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                  <span class="font-bold text-[#1d1814]">CAD PERSPECTIVE ENGINE</span>
+                </span>
+                <span id="angleReadout">X: 0.0° | Y: 0.0°</span>
+              </div>
+
+              <!-- VIEW A: 3D Perspective Photo Stage with Hotspots -->
+              <div
+                id="photo3DStage"
+                class="relative w-full h-[320px] sm:h-[380px] flex items-center justify-center transition-all duration-300"
+              >
+                <!-- 3D Card that tilts with mouse/touch -->
+                <div
+                  id="cadModelCard"
+                  class="cad-model-card relative max-w-full max-h-full flex items-center justify-center p-3 sm:p-5"
+                >
+                  <!-- The Physical Prototype Photo Image -->
+                  <div class="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-[#1d1814]/15 bg-white">
+                    <img
+                      id="prototypePhotoImg"
+                      src="assets/fan-cleaning-robot.jpg"
+                      alt="Automatic Rodless Ceiling Fan Cleaning Robot Prototype by Henil Patel"
+                      class="max-w-full h-auto max-h-[260px] sm:max-h-[300px] object-contain block select-none pointer-events-none"
+                    />
+                    <!-- Dynamic Specular Glare Overlay -->
+                    <div id="photoGlareOverlay" class="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-200"></div>
+                  </div>
+
+                  <!-- 4 Interactive 3D Hotspot Pins -->
+                  <!-- Hotspot 1: Rollers -->
+                  <div
+                    class="cad-hotspot-pin absolute top-[48%] left-[55%] -translate-x-1/2 -translate-y-1/2 z-30 cursor-pointer group"
+                    data-hotspot="1"
+                  >
+                    <span class="relative flex h-7 w-7 items-center justify-center">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#b47834] opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-7 w-7 bg-[#1d1814] text-white border-2 border-[#b47834] font-mono text-xs font-bold items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b47834] transition-all">
+                        1
+                      </span>
+                    </span>
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap px-2.5 py-1 rounded-lg bg-[#1d1814] text-white text-[10px] font-mono shadow-xl pointer-events-none z-40">
+                      Dual Counter-Rotating Rollers
+                    </div>
+                  </div>
+
+                  <!-- Hotspot 2: Guide Wheels -->
+                  <div
+                    class="cad-hotspot-pin absolute top-[55%] left-[26%] -translate-x-1/2 -translate-y-1/2 z-30 cursor-pointer group"
+                    data-hotspot="2"
+                  >
+                    <span class="relative flex h-7 w-7 items-center justify-center">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#b47834] opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-7 w-7 bg-[#1d1814] text-white border-2 border-[#b47834] font-mono text-xs font-bold items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b47834] transition-all">
+                        2
+                      </span>
+                    </span>
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap px-2.5 py-1 rounded-lg bg-[#1d1814] text-white text-[10px] font-mono shadow-xl pointer-events-none z-40">
+                      Blade Guide Wheels &amp; Clamp
+                    </div>
+                  </div>
+
+                  <!-- Hotspot 3: Control Unit -->
+                  <div
+                    class="cad-hotspot-pin absolute top-[24%] left-[54%] -translate-x-1/2 -translate-y-1/2 z-30 cursor-pointer group"
+                    data-hotspot="3"
+                  >
+                    <span class="relative flex h-7 w-7 items-center justify-center">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#b47834] opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-7 w-7 bg-[#1d1814] text-white border-2 border-[#b47834] font-mono text-xs font-bold items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b47834] transition-all">
+                        3
+                      </span>
+                    </span>
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap px-2.5 py-1 rounded-lg bg-[#1d1814] text-white text-[10px] font-mono shadow-xl pointer-events-none z-40">
+                      Control Unit &amp; Power Module
+                    </div>
+                  </div>
+
+                  <!-- Hotspot 4: Traversal -->
+                  <div
+                    class="cad-hotspot-pin absolute top-[76%] left-[18%] -translate-x-1/2 -translate-y-1/2 z-30 cursor-pointer group"
+                    data-hotspot="4"
+                  >
+                    <span class="relative flex h-7 w-7 items-center justify-center">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#b47834] opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-7 w-7 bg-[#1d1814] text-white border-2 border-[#b47834] font-mono text-xs font-bold items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#b47834] transition-all">
+                        4
+                      </span>
+                    </span>
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap px-2.5 py-1 rounded-lg bg-[#1d1814] text-white text-[10px] font-mono shadow-xl pointer-events-none z-40">
+                      Autonomous Blade Traversal
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- VIEW B: Three.js Live 360° Simulation -->
+              <div id="three3DStage" class="hidden relative w-full h-[320px] sm:h-[380px] flex items-center justify-center cursor-grab active:cursor-grabbing">
+                <div id="threeCanvasContainer" class="w-full h-full"></div>
+                <div class="absolute bottom-3 left-4 z-20 px-3 py-1.5 rounded-xl bg-white/95 border border-[#d9cdba] text-[11px] font-mono text-[#5c4e40] shadow-sm pointer-events-none">
+                  Drag to Orbit 360° • Scroll to Zoom
+                </div>
+                <button
+                  id="toggleWireframeBtn"
+                  type="button"
+                  class="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-xl bg-white/95 border border-[#d9cdba] text-[11px] font-mono text-[#5c4e40] hover:text-[#1d1814] shadow-sm transition-all"
+                >
+                  Wireframe: OFF
+                </button>
+              </div>
+
+              <!-- Bottom Viewport Controls -->
+              <div class="w-full pt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#ded3be] text-xs font-mono text-[#786b5e] z-10">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#b47834]"></span>
+                  Hover/drag cursor over image to tilt in 3D
+                </span>
+                <div class="flex items-center gap-2">
+                  <button
+                    id="autoTiltToggleBtn"
+                    type="button"
+                    class="px-2.5 py-1 rounded-lg bg-white border border-[#d9ccb9] hover:bg-[#faf6f0] text-[11px] text-[#483d33] transition-colors"
+                  >
+                    Auto-Tilt: ON
+                  </button>
+                  <button
+                    id="resetAngleBtn"
+                    type="button"
+                    class="px-2.5 py-1 rounded-lg bg-white border border-[#d9ccb9] hover:bg-[#faf6f0] text-[11px] text-[#483d33] transition-colors"
+                  >
+                    Reset Angle
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Right Column: Engineering Leadership & Live Hotspot Details -->
+          <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
+            <div>
+              <!-- Leadership Callout Card -->
+              <div class="p-5 rounded-2xl bg-[#faf6f0] border border-[#e2d5c1] mb-5 shadow-xs">
+                <div class="flex items-center gap-2.5 mb-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                  <span class="font-mono text-xs font-bold text-[#1d1814] uppercase">Project Leadership Role</span>
+                </div>
+                <div class="font-serif text-xl font-bold text-[#1d1814]">
+                  Head / Leading Member — Electromechanical System Design
+                </div>
+                <p class="text-xs text-[#5c4e40] leading-relaxed mt-2">
+                  Led physical chassis dimensioning, dual high-torque DC motor drive architecture, optical edge sensor placement, and integrated safety reverse sequences under academic capstone supervision.
+                </p>
+              </div>
+
+              <!-- Dynamic Hotspot Information Panel -->
+              <div id="hotspotDetailsCard" class="vintage-card rounded-2xl p-6 border-accent/40 bg-white">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <div class="flex items-center gap-2.5">
+                    <span id="hotspotBadgeNumber" class="w-7 h-7 rounded-full bg-[#1d1814] text-white border border-accent font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                      1
+                    </span>
+                    <h3 id="hotspotTitle" class="font-serif text-lg font-bold text-[#1d1814]">
+                      Dual Counter-Rotating Rollers
+                    </h3>
+                  </div>
+                  <span class="font-mono text-[10px] text-accent font-bold uppercase tracking-wider">
+                    HOTSPOT INSPECTION
+                  </span>
+                </div>
+
+                <p id="hotspotDescription" class="text-xs sm:text-sm text-[#483d33] leading-relaxed mb-4">
+                  High-RPM textured microfiber cylindrical rollers turn simultaneously in opposite directions to sweep and vacuum accumulated particulate matter from both top and bottom blade surfaces without scratching.
+                </p>
+
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono text-[#5c4e40] pt-3 border-t border-[#f0e6d6]">
+                  <div><strong class="text-[#1d1814]">Drive:</strong> <span id="hotspotSpecDrive">Dual DC Geared 12V</span></div>
+                  <div><strong class="text-[#1d1814]">RPM:</strong> <span id="hotspotSpecRpm">450 RPM / High Torque</span></div>
+                  <div><strong class="text-[#1d1814]">Material:</strong> <span id="hotspotSpecMaterial">Lime Microfiber</span></div>
+                  <div><strong class="text-[#1d1814]">Control:</strong> <span id="hotspotSpecControl">H-Bridge PWM</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Specs Row -->
+            <div class="grid grid-cols-3 gap-3 pt-2 text-center font-mono">
+              <div class="p-3 rounded-xl bg-[#faf6f0] border border-[#e5dcce]">
+                <div class="text-[10px] text-[#786b5e]">TRAVERSAL</div>
+                <div class="font-bold text-xs text-[#1d1814] mt-0.5">Rodless Clamp</div>
+              </div>
+              <div class="p-3 rounded-xl bg-[#faf6f0] border border-[#e5dcce]">
+                <div class="text-[10px] text-[#786b5e]">REVERSAL</div>
+                <div class="font-bold text-xs text-[#1d1814] mt-0.5">Dual Limit Sw.</div>
+              </div>
+              <div class="p-3 rounded-xl bg-[#faf6f0] border border-[#e5dcce]">
+                <div class="text-[10px] text-[#786b5e]">BATTERY</div>
+                <div class="font-bold text-xs text-[#1d1814] mt-0.5">3S Li-ion 11.1V</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== ALL ENGINEERING BUILDS GALLERY ==================== -->
+      <div class="mb-10">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#1d1814]">
+              Hardware &amp; Circuit Systems Portfolio
+            </h2>
+            <p class="text-xs sm:text-sm text-[#786b5e] font-mono mt-1">
+              Peer-reviewed academic lab projects and hardware prototypes.
+            </p>
+          </div>
+
+          <!-- Filter Pills -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" data-filter="all" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-[#1d1814] text-white transition-all shadow-xs">
+              All Builds
+            </button>
+            <button type="button" data-filter="robotics" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all">
+              Robotics Lead
+            </button>
+            <button type="button" data-filter="logic" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all">
+              Digital Logic
+            </button>
+            <button type="button" data-filter="circuits" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all">
+              Circuit Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- Projects Grid -->
+        <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Dynamically populated via JavaScript below -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================== BLUEPRINT MODAL ==================== -->
+  <div id="projectModal" class="fixed inset-0 z-50 bg-[#1d1814]/75 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl border border-[#d9cdba] shadow-2xl p-6 sm:p-8">
+      <button id="closeModalBtn" type="button" class="absolute top-5 right-5 p-2 rounded-xl bg-[#faf6f0] text-[#1d1814] hover:bg-[#ede3d1] transition-colors">
+        ✕
+      </button>
+
+      <span id="modalCategoryBadge" class="inline-block px-3 py-1 rounded-full bg-[#faf6f0] border border-[#d6c7b1] font-mono text-[11px] text-accent font-semibold mb-3">
+        HARDWARE
+      </span>
+      <h3 id="modalTitle" class="font-serif text-2xl font-bold text-[#1d1814] mb-3">
+        Project Specification
+      </h3>
+      <p id="modalDescription" class="text-sm text-[#483d33] leading-relaxed mb-6">
+        Detailed description...
+      </p>
+
+      <div id="modalImageContainer" class="mb-6 rounded-2xl overflow-hidden border border-[#e5dcce] bg-[#faf6f0] p-4 flex items-center justify-center">
+        <img id="modalImage" src="" alt="Blueprint" class="max-h-64 object-contain rounded-lg" />
+      </div>
+
+      <h4 class="font-mono text-xs uppercase font-bold text-[#1d1814] mb-2 tracking-wider">Engineering Highlights</h4>
+      <ul id="modalHighlights" class="list-disc list-inside text-xs sm:text-sm text-[#5c4e40] space-y-1.5 mb-6">
+      </ul>
+
+      <h4 class="font-mono text-xs uppercase font-bold text-[#1d1814] mb-2 tracking-wider">Technologies &amp; Schematics</h4>
+      <div id="modalTags" class="flex flex-wrap gap-2">
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="py-12 border-t border-[#e2d6c3] bg-[#f4eee2] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-[#ded3be]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white border border-[#d9ccb9] flex items-center justify-center font-serif font-bold text-base text-[#1d1814]">
+            HP<span class="text-accent">.</span>
+          </div>
+          <div>
+            <div class="font-serif font-bold text-base text-[#1d1814]">Henil Patel</div>
+            <div class="font-mono text-xs text-[#786b5e]">Electronics Engineering &amp; Hardware Prototyping</div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-5 font-mono text-xs font-semibold text-[#483d33]">
+          <a href="index.html" class="hover:text-accent transition-colors">00 // Command Deck</a>
+          <a href="projects.html" class="text-accent">01 // 3D Projects Lab</a>
+          <a href="certificates.html" class="hover:text-accent transition-colors">02 // Certificate Vault</a>
+          <a href="feedback.html" class="hover:text-accent transition-colors">03 // Defense &amp; Reviews</a>
+        </div>
+      </div>
+
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#786b5e] font-mono">
+        <div>&copy; 2026 HENIL PATEL // HP.LAB // VINTAGE WORKSTATION EDITION</div>
+        <div>HOSTED ON LOCAL WORKSPACE // KARNAVATI UNIVERSITY</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== 3D ENGINE & DATA SCRIPT ==================== -->
+  <script>
+    (function () {
+      /* 1. Theme Persistence */
+      const currentTheme = localStorage.getItem('henil_theme') || 'brass';
+      document.body.setAttribute('data-theme', currentTheme);
+
+      const themeButtons = document.querySelectorAll('[data-set-theme]');
+      function updateThemeButtons(theme) {
+        themeButtons.forEach((btn) => {
+          const t = btn.getAttribute('data-set-theme');
+          if (t === theme) {
+            btn.className = 'theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all bg-[#faf6f0] text-[#1d1814] shadow-xs';
+          } else {
+            btn.className = 'theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814] transition-all';
+          }
+        });
+      }
+      updateThemeButtons(currentTheme);
+
+      themeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const selected = btn.getAttribute('data-set-theme');
+          document.body.setAttribute('data-theme', selected);
+          localStorage.setItem('henil_theme', selected);
+          updateThemeButtons(selected);
+        });
+      });
+
+      /* Mobile Drawer */
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mobileNavMenu = document.getElementById('mobileNavMenu');
+      if (mobileMenuToggle && mobileNavMenu) {
+        mobileMenuToggle.addEventListener('click', () => {
+          mobileNavMenu.classList.toggle('hidden');
+        });
+      }
+
+      /* 2. Mode Toggle: Photo Hotspots vs Three.js Simulation */
+      const viewModePhotoBtn = document.getElementById('viewModePhotoBtn');
+      const viewModeThreeBtn = document.getElementById('viewModeThreeBtn');
+      const photo3DStage = document.getElementById('photo3DStage');
+      const three3DStage = document.getElementById('three3DStage');
+
+      let currentMode = 'photo';
+
+      function setViewMode(mode) {
+        currentMode = mode;
+        if (mode === 'photo') {
+          viewModePhotoBtn.className = 'px-4 py-2 rounded-xl font-mono text-xs font-bold bg-[#1d1814] text-white transition-all shadow-xs';
+          viewModeThreeBtn.className = 'px-4 py-2 rounded-xl font-mono text-xs font-semibold text-[#5c4e40] hover:text-[#1d1814] transition-all';
+          photo3DStage.classList.remove('hidden');
+          three3DStage.classList.add('hidden');
+        } else {
+          viewModeThreeBtn.className = 'px-4 py-2 rounded-xl font-mono text-xs font-bold bg-[#1d1814] text-white transition-all shadow-xs';
+          viewModePhotoBtn.className = 'px-4 py-2 rounded-xl font-mono text-xs font-semibold text-[#5c4e40] hover:text-[#1d1814] transition-all';
+          photo3DStage.classList.add('hidden');
+          three3DStage.classList.remove('hidden');
+          if (!threeInitialized) initThreeSimulation();
+        }
+      }
+
+      viewModePhotoBtn.addEventListener('click', () => setViewMode('photo'));
+      viewModeThreeBtn.addEventListener('click', () => setViewMode('three'));
+
+      /* 3. Interactive 3D Perspective Tilt for Prototype Photo */
+      const cadModelCard = document.getElementById('cadModelCard');
+      const photoGlareOverlay = document.getElementById('photoGlareOverlay');
+      const angleReadout = document.getElementById('angleReadout');
+      const autoTiltToggleBtn = document.getElementById('autoTiltToggleBtn');
+      const resetAngleBtn = document.getElementById('resetAngleBtn');
+
+      let autoTilt = true;
+      let targetTiltX = 0, targetTiltY = 0;
+      let currentTiltX = 0, currentTiltY = 0;
+      let autoAngle = 0;
+
+      autoTiltToggleBtn.addEventListener('click', () => {
+        autoTilt = !autoTilt;
+        autoTiltToggleBtn.textContent = autoTilt ? 'Auto-Tilt: ON' : 'Auto-Tilt: OFF';
+      });
+
+      resetAngleBtn.addEventListener('click', () => {
+        autoTilt = false;
+        autoTiltToggleBtn.textContent = 'Auto-Tilt: OFF';
+        targetTiltX = 0;
+        targetTiltY = 0;
+      });
+
+      photo3DStage.addEventListener('mousemove', (e) => {
+        autoTilt = false;
+        autoTiltToggleBtn.textContent = 'Auto-Tilt: OFF';
+        const rect = photo3DStage.getBoundingClientRect();
+        const normX = (e.clientX - rect.left) / rect.width - 0.5;
+        const normY = (e.clientY - rect.top) / rect.height - 0.5;
+
+        targetTiltY = normX * 28;
+        targetTiltX = -normY * 24;
+
+        if (photoGlareOverlay) {
+          const glareX = (normX + 0.5) * 100;
+          const glareY = (normY + 0.5) * 100;
+          photoGlareOverlay.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.45) 0%, transparent 65%)`;
+          photoGlareOverlay.style.opacity = '1';
+        }
+      });
+
+      photo3DStage.addEventListener('mouseleave', () => {
+        if (!autoTilt) {
+          targetTiltX = 0;
+          targetTiltY = 0;
+        }
+        if (photoGlareOverlay) photoGlareOverlay.style.opacity = '0';
+      });
+
+      function animatePhotoTilt() {
+        if (currentMode === 'photo') {
+          if (autoTilt) {
+            autoAngle += 0.02;
+            targetTiltY = Math.sin(autoAngle) * 12;
+            targetTiltX = Math.cos(autoAngle * 0.8) * 8;
+          }
+
+          currentTiltX += (targetTiltX - currentTiltX) * 0.1;
+          currentTiltY += (targetTiltY - currentTiltY) * 0.1;
+
+          if (cadModelCard) {
+            cadModelCard.style.transform = `rotateX(${currentTiltX.toFixed(2)}deg) rotateY(${currentTiltY.toFixed(2)}deg)`;
+          }
+          if (angleReadout) {
+            angleReadout.textContent = `X: ${currentTiltX.toFixed(1)}° | Y: ${currentTiltY.toFixed(1)}°`;
+          }
+        }
+        requestAnimationFrame(animatePhotoTilt);
+      }
+      requestAnimationFrame(animatePhotoTilt);
+
+      /* 4. Hotspot Pins Data & Interaction */
+      const hotspotData = {
+        1: {
+          title: "Dual Counter-Rotating Rollers",
+          desc: "High-RPM textured microfiber cylindrical rollers turn simultaneously in opposite directions to sweep and vacuum accumulated particulate matter from both top and bottom blade surfaces without scratching.",
+          drive: "Dual DC Geared 12V",
+          rpm: "450 RPM / High Torque",
+          material: "Lime Microfiber Sleeves",
+          control: "H-Bridge PWM"
+        },
+        2: {
+          title: "Blade Guide Wheels & Clamp",
+          desc: "Precision lateral guide wheels align the chassis onto the fan blade contours, maintaining uniform clamping force and preventing chassis slipping during high-speed rotational sweeps.",
+          drive: "Passive Ball Bearing",
+          rpm: "Dual Lateral Axis",
+          material: "Nylon Polymer Core",
+          control: "Spring-Loaded Clamp"
+        },
+        3: {
+          title: "Control Unit & Power Module",
+          desc: "Central microcontroller with integrated motor drivers, high-discharge lithium-ion pack, safety limit switch inputs, and telemetry indicators.",
+          drive: "Microcontroller Board",
+          rpm: "Clock 160MHz",
+          material: "FR-4 PCB Enclosure",
+          control: "3S Li-ion (11.1V)"
+        },
+        4: {
+          title: "Autonomous Blade Traversal",
+          desc: "Bi-directional optical and mechanical limit switches detect blade edges, instantly inverting roller motor polarity to complete full traversal along the fan blade.",
+          drive: "Bi-Directional Sweep",
+          rpm: "Edge Sensed in 25ms",
+          material: "Micro-Switch Sensors",
+          control: "State-Machine Firmware"
+        }
+      };
+
+      const hotspotBadgeNumber = document.getElementById('hotspotBadgeNumber');
+      const hotspotTitle = document.getElementById('hotspotTitle');
+      const hotspotDescription = document.getElementById('hotspotDescription');
+      const hotspotSpecDrive = document.getElementById('hotspotSpecDrive');
+      const hotspotSpecRpm = document.getElementById('hotspotSpecRpm');
+      const hotspotSpecMaterial = document.getElementById('hotspotSpecMaterial');
+      const hotspotSpecControl = document.getElementById('hotspotSpecControl');
+
+      function selectHotspot(num) {
+        const data = hotspotData[num];
+        if (!data) return;
+        hotspotBadgeNumber.textContent = num;
+        hotspotTitle.textContent = data.title;
+        hotspotDescription.textContent = data.desc;
+        hotspotSpecDrive.textContent = data.drive;
+        hotspotSpecRpm.textContent = data.rpm;
+        hotspotSpecMaterial.textContent = data.material;
+        hotspotSpecControl.textContent = data.control;
+      }
+
+      document.querySelectorAll('.cad-hotspot-pin').forEach((pin) => {
+        pin.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const num = pin.getAttribute('data-hotspot');
+          selectHotspot(num);
+        });
+      });
+
+      /* 5. Three.js Procedural 3D WebGL Simulation */
+      let threeInitialized = false;
+      let scene, camera, renderer, robotGroup, roller1, roller2, ledMesh;
+      let isDragging = false, prevMouseX = 0, prevMouseY = 0;
+      let isWireframe = false;
+
+      function initThreeSimulation() {
+        const container = document.getElementById('threeCanvasContainer');
+        if (!container) return;
+
+        threeInitialized = true;
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf5efe4);
+
+        camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 14, 28);
+        camera.lookAt(0, 0, 0);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xfff7ed, 0.85);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        dirLight.position.set(15, 25, 20);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        const fillLight = new THREE.DirectionalLight(0xedd9c0, 0.5);
+        fillLight.position.set(-15, 10, -10);
+        scene.add(fillLight);
+
+        // The Fan Blade
+        const bladeGeo = new THREE.BoxGeometry(32, 0.5, 7);
+        const bladeMat = new THREE.MeshStandardMaterial({
+          color: 0x3d3935,
+          roughness: 0.4,
+          metalness: 0.3
+        });
+        const blade = new THREE.Mesh(bladeGeo, bladeMat);
+        blade.position.y = -0.3;
+        scene.add(blade);
+
+        // Robot Group
+        robotGroup = new THREE.Group();
+
+        // Main Chassis
+        const chassisGeo = new THREE.BoxGeometry(11, 4.2, 5.8);
+        const chassisMat = new THREE.MeshStandardMaterial({
+          color: 0x221f1d,
+          roughness: 0.3,
+          metalness: 0.5
+        });
+        const chassis = new THREE.Mesh(chassisGeo, chassisMat);
+        chassis.position.y = 2.1;
+        robotGroup.add(chassis);
+
+        // Accent End Caps
+        const capGeo = new THREE.BoxGeometry(0.8, 3.6, 5.2);
+        const capMat = new THREE.MeshStandardMaterial({
+          color: 0x98c93c,
+          roughness: 0.3
+        });
+        const leftCap = new THREE.Mesh(capGeo, capMat);
+        leftCap.position.set(-5.6, 2.1, 0);
+        robotGroup.add(leftCap);
+
+        const rightCap = new THREE.Mesh(capGeo, capMat);
+        rightCap.position.set(5.6, 2.1, 0);
+        robotGroup.add(rightCap);
+
+        // Rollers (Lime Green Textured Cylinders)
+        const rollerGeo = new THREE.CylinderGeometry(1.05, 1.05, 9.6, 28);
+        const rollerMat = new THREE.MeshStandardMaterial({
+          color: 0x82b828,
+          roughness: 0.85
+        });
+
+        roller1 = new THREE.Mesh(rollerGeo, rollerMat);
+        roller1.rotation.z = Math.PI / 2;
+        roller1.position.set(0, 1.3, 1.8);
+        robotGroup.add(roller1);
+
+        roller2 = new THREE.Mesh(rollerGeo, rollerMat);
+        roller2.rotation.z = Math.PI / 2;
+        roller2.position.set(0, 3.0, 1.8);
+        robotGroup.add(roller2);
+
+        // Top Status LED Indicator
+        const ledGeo = new THREE.SphereGeometry(0.35, 16, 16);
+        const ledMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+        ledMesh = new THREE.Mesh(ledGeo, ledMat);
+        ledMesh.position.set(0, 4.35, 0.4);
+        robotGroup.add(ledMesh);
+
+        scene.add(robotGroup);
+
+        // Drag to Orbit & Zoom
+        const canvas = renderer.domElement;
+        canvas.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          prevMouseX = e.clientX;
+          prevMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        window.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          const deltaX = e.clientX - prevMouseX;
+          const deltaY = e.clientY - prevMouseY;
+          prevMouseX = e.clientX;
+          prevMouseY = e.clientY;
+
+          scene.rotation.y += deltaX * 0.009;
+          scene.rotation.x += deltaY * 0.009;
+        });
+
+        canvas.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          camera.position.z += e.deltaY * 0.02;
+          camera.position.z = Math.max(14, Math.min(50, camera.position.z));
+        }, { passive: false });
+
+        // Wireframe Toggle
+        const toggleWireframeBtn = document.getElementById('toggleWireframeBtn');
+        toggleWireframeBtn.addEventListener('click', () => {
+          isWireframe = !isWireframe;
+          toggleWireframeBtn.textContent = isWireframe ? 'Wireframe: ON' : 'Wireframe: OFF';
+          chassisMat.wireframe = isWireframe;
+          bladeMat.wireframe = isWireframe;
+          rollerMat.wireframe = isWireframe;
+        });
+
+        function animateThree() {
+          requestAnimationFrame(animateThree);
+          if (currentMode === 'three') {
+            // Spin cleaning rollers
+            if (roller1 && roller2) {
+              roller1.rotation.y += 0.08;
+              roller2.rotation.y -= 0.08;
+            }
+            // Gentle LED pulse
+            if (ledMesh) {
+              const pulse = (Math.sin(Date.now() * 0.005) + 1) / 2;
+              ledMesh.scale.setScalar(0.9 + pulse * 0.25);
+            }
+            renderer.render(scene, camera);
+          }
+        }
+        animateThree();
+
+        window.addEventListener('resize', () => {
+          if (!container || !renderer || !camera) return;
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+      }
+
+      /* 6. Projects Grid Data & Filtering */
+      const projects = [
+        {
+          id: 'fan-cleaning-robot',
+          title: 'Automatic Rodless Ceiling Fan Cleaning Robot',
+          category: 'robotics',
+          categoryLabel: 'Capstone Prototyping // Lead',
+          summary: 'An autonomous electromechanical robot designed to clamp onto suspended fan blades, traverse both edges rodlessly, and vacuum debris with dual high-RPM rollers.',
+          image: 'assets/fan-cleaning-robot.jpg',
+          tags: ['SOLIDWORKS 2024', 'Dual 12V Motors', 'H-Bridge PWM', 'Edge Sensors', 'Lead Member'],
+          highlights: [
+            'Conceived and designed under Henil Patel\'s role as Leading Member.',
+            'Engineered dual counter-rotating microfiber cylindrical rollers for high-efficiency cleaning.',
+            'Eliminated hazardous manual ladders using an autonomous self-centering clamp mechanism.',
+            'Equipped with optical and mechanical limit switches for automatic polarity inversion at blade tips.'
+          ]
+        },
+        {
+          id: 'logic-suite',
+          title: 'Combinational Logic Minimization Suite',
+          category: 'logic',
+          categoryLabel: 'Digital Logic // Verilog HDL',
+          summary: 'Software and hardware prototype for multi-variable Boolean minimization, implementing Quine-McCluskey algorithms and gate-level synthesis verification.',
+          image: null,
+          tags: ['Digital Logic', 'Verilog HDL', 'K-Map Reduction', 'Breadboard TTL'],
+          highlights: [
+            'Simulated 4-to-16 decoders and multiplexer trees in Verilog HDL.',
+            'Constructed 74LS TTL series physical circuit breadboard prototypes.',
+            'Validated propagation delay and logic hazard suppression techniques.'
+          ]
+        },
+        {
+          id: 'circuit-nodal-lab',
+          title: 'Multi-Node DC Circuit Solver & Testbench',
+          category: 'circuits',
+          categoryLabel: 'Circuit Analysis // SPICE',
+          summary: 'Nodal and mesh analysis simulation workbench verifying Kirchhoff laws, Thevenin equivalents, and maximum power transfer theorems against physical measurements.',
+          image: null,
+          tags: ['Kirchhoff Laws', 'Thevenin Theorem', 'SPICE Modeling', 'Analog Metering'],
+          highlights: [
+            'Constructed bridged-T and ladder resistor networks with 0.1% tolerance resistors.',
+            'Benchmarked nodal voltage calculations against benchtop digital multimeter telemetry.',
+            'Documented impedance matching for maximum power transfer under complex DC loads.'
+          ]
+        },
+        {
+          id: 'embedded-sensor-node',
+          title: 'Embedded Multi-Sensor Controller & Telemetry',
+          category: 'robotics',
+          categoryLabel: 'Embedded C // Firmware',
+          summary: 'Low-power microcontroller firmware handling real-time sensor polling, I2C temperature and IMU telemetry, and motor interrupt routines.',
+          image: null,
+          tags: ['C Programming', 'I2C / SPI', 'Interrupt Handlers', 'Hardware Timers'],
+          highlights: [
+            'Written in bare-metal C for deterministic sensor acquisition.',
+            'Implemented hardware timer interrupts for jitter-free PWM motor control.',
+            'Validated serial packet communications via UART oscilloscope probes.'
+          ]
+        }
+      ];
+
+      const projectsGrid = document.getElementById('projectsGrid');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+
+      function renderProjects(filter = 'all') {
+        const filtered = filter === 'all' ? projects : projects.filter(p => p.category === filter);
+        projectsGrid.innerHTML = filtered.map(proj => `
+          <article class="vintage-card rounded-3xl overflow-hidden flex flex-col justify-between group bg-white border border-[#e5dcce]">
+            <div>
+              <div class="h-44 bg-gradient-to-br from-[#faf6f0] via-[#f5ede0] to-[#ece1cf] border-b border-[#e5dcce] p-6 flex flex-col justify-between relative overflow-hidden">
+                <div class="flex items-center justify-between z-10">
+                  <span class="px-3 py-1 rounded-full bg-white/90 border border-[#d9ccb9] font-mono text-[11px] text-accent font-semibold shadow-xs">
+                    ${proj.categoryLabel}
+                  </span>
+                  <span class="font-mono text-xs text-[#786b5e] font-medium">SPEC SHEET</span>
+                </div>
+                ${proj.image ? `
+                  <div class="z-10 flex items-center gap-3">
+                    <img src="${proj.image}" alt="${proj.title}" class="h-16 w-auto object-contain rounded-lg drop-shadow bg-white/90 p-1 border border-[#d9ccba]" />
+                    <span class="text-xs font-mono font-semibold text-[#1d1814]">3D CAD Model &amp; Prototype</span>
+                  </div>
+                ` : `
+                  <div class="z-10 flex items-center gap-2 mt-4">
+                    <div class="h-2.5 w-2.5 rounded-full bg-[#1d1814]/70"></div>
+                    <div class="h-1.5 w-24 rounded-full bg-[#1d1814]/25"></div>
+                    <div class="h-1.5 w-12 rounded-full bg-[#1d1814]/15"></div>
+                  </div>
+                `}
+              </div>
+
+              <div class="p-6">
+                <h3 class="font-serif text-xl font-bold text-[#1d1814] mb-2.5 group-hover:text-accent transition-colors">
+                  ${proj.title}
+                </h3>
+                <p class="text-sm text-[#483d33] leading-relaxed mb-5">
+                  ${proj.summary}
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  ${proj.tags.map(t => `<span class="px-2.5 py-1 rounded-lg bg-[#faf6f0] border border-[#e5dcce] font-mono text-[11px] text-[#483d33]">${t}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+
+            <div class="px-6 pb-6 pt-3 flex items-center justify-between border-t border-[#f0e7d9]">
+              <button
+                type="button"
+                data-open-project="${proj.id}"
+                class="open-project-btn inline-flex items-center gap-2 text-xs font-semibold text-[#1d1814] hover:text-accent transition-colors py-2"
+              >
+                <span>Inspect Blueprint &amp; Specs</span>
+                <span class="transition-transform group-hover:translate-x-1">→</span>
+              </button>
+            </div>
+          </article>
+        `).join('');
+
+        document.querySelectorAll('.open-project-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-open-project');
+            const project = projects.find(p => p.id === id);
+            if (project) openProjectModal(project);
+          });
+        });
+      }
+
+      renderProjects('all');
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filter = btn.getAttribute('data-filter');
+          filterBtns.forEach(b => {
+            b.className = 'filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all';
+          });
+          btn.className = 'filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-[#1d1814] text-white transition-all shadow-xs';
+          renderProjects(filter);
+        });
+      });
+
+      /* 7. Modal Logic */
+      const projectModal = document.getElementById('projectModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const modalCategoryBadge = document.getElementById('modalCategoryBadge');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalDescription = document.getElementById('modalDescription');
+      const modalImageContainer = document.getElementById('modalImageContainer');
+      const modalImage = document.getElementById('modalImage');
+      const modalHighlights = document.getElementById('modalHighlights');
+      const modalTags = document.getElementById('modalTags');
+
+      function openProjectModal(proj) {
+        modalCategoryBadge.textContent = proj.categoryLabel;
+        modalTitle.textContent = proj.title;
+        modalDescription.textContent = proj.summary;
+        if (proj.image) {
+          modalImage.src = proj.image;
+          modalImageContainer.classList.remove('hidden');
+        } else {
+          modalImageContainer.classList.add('hidden');
+        }
+        modalHighlights.innerHTML = proj.highlights.map(h => `<li>${h}</li>`).join('');
+        modalTags.innerHTML = proj.tags.map(t => `<span class="px-3 py-1 rounded-xl bg-[#faf6f0] border border-[#e5dcce] font-mono text-xs text-[#3d3328]">${t}</span>`).join('');
+        projectModal.classList.remove('hidden');
+        projectModal.classList.add('flex');
+      }
+
+      function closeProjectModal() {
+        projectModal.classList.add('hidden');
+        projectModal.classList.remove('flex');
+      }
+
+      closeModalBtn.addEventListener('click', closeProjectModal);
+      projectModal.addEventListener('click', (e) => {
+        if (e.target === projectModal) closeProjectModal();
+      });
+
+    })();
+  </script>
+</body>
+</html>

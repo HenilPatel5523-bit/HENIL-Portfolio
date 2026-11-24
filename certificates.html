@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reflector Credential Vault // Henil Patel</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Fraunces', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            accent: {
+              DEFAULT: 'var(--accent)',
+              soft: 'var(--accent-soft)',
+              glow: 'var(--accent-glow)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-canvas: #faf6f0;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f4eee2;
+      --border-subtle: #e5dcce;
+      --border-strong: #d2c4b0;
+      --text-primary: #1d1814;
+      --text-secondary: #483d33;
+      --text-muted: #786b5e;
+      --accent: #b47834;
+      --accent-soft: #f4ede2;
+      --accent-glow: rgba(180, 120, 52, 0.22);
+      --accent-rgb: 180, 120, 52;
+      --grid-line: rgba(180, 120, 52, 0.07);
+    }
+
+    [data-theme="blueprint"] {
+      --bg-canvas: #f6f8fb;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #eaf0f7;
+      --border-subtle: #d3dfed;
+      --border-strong: #b8ccdf;
+      --text-primary: #0f1f2e;
+      --text-secondary: #2b4257;
+      --text-muted: #5a748c;
+      --accent: #1a6b8a;
+      --accent-soft: #e2f0f7;
+      --accent-glow: rgba(26, 107, 138, 0.22);
+      --accent-rgb: 26, 107, 138;
+      --grid-line: rgba(26, 107, 138, 0.08);
+    }
+
+    [data-theme="verdigris"] {
+      --bg-canvas: #f6f8f5;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #e9f0e8;
+      --border-subtle: #d2ded0;
+      --border-strong: #b4c7b1;
+      --text-primary: #112015;
+      --text-secondary: #293d2e;
+      --text-muted: #57705d;
+      --accent: #2e7d5b;
+      --accent-soft: #e3f2ea;
+      --accent-glow: rgba(46, 125, 91, 0.22);
+      --accent-rgb: 46, 125, 91;
+      --grid-line: rgba(46, 125, 91, 0.08);
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .drafting-grid {
+      background-color: var(--bg-canvas);
+      background-image:
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .vintage-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 4px 18px -4px rgba(40, 30, 20, 0.05);
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* 3D Reflector Foil Holographic Card */
+    .reflector-stage {
+      perspective: 1200px;
+    }
+
+    .reflector-card-container {
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.15s ease-out, box-shadow 0.25s ease;
+    }
+
+    /* Holographic Prismatic Sheen Overlay */
+    .reflector-foil {
+      position: absolute;
+      inset: 0;
+      border-radius: 1.5rem;
+      pointer-events: none;
+      z-index: 20;
+      mix-blend-mode: overlay;
+      opacity: 0;
+      background: linear-gradient(
+        115deg,
+        transparent 15%,
+        rgba(255, 255, 255, 0.7) 35%,
+        rgba(255, 215, 0, 0.5) 45%,
+        rgba(0, 255, 255, 0.45) 55%,
+        rgba(255, 0, 128, 0.35) 65%,
+        transparent 80%
+      );
+      background-size: 200% 200%;
+      transition: opacity 0.3s ease;
+    }
+
+    .reflector-card-container:hover .reflector-foil {
+      opacity: 0.9;
+    }
+
+    /* Ambient foil shimmer animation when idle */
+    @keyframes foilShimmer {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
+    }
+    .ambient-foil {
+      animation: foilShimmer 8s ease-in-out infinite;
+    }
+
+    /* 3D Coverflow Deck */
+    .coverflow-stage {
+      perspective: 1400px;
+      overflow: hidden;
+    }
+    .coverflow-track {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .coverflow-item {
+      position: absolute;
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+    }
+
+    ::-webkit-scrollbar { width: 9px; }
+    ::-webkit-scrollbar-track { background: var(--bg-canvas); }
+    ::-webkit-scrollbar-thumb {
+      background: #cfc4b2;
+      border-radius: 9999px;
+      border: 2px solid var(--bg-canvas);
+    }
+  </style>
+</head>
+<body data-theme="brass" class="drafting-grid antialiased selection:bg-[#e8d5be] selection:text-[#382a1b]">
+
+  <!-- ==================== VINTAGE NAVBAR ==================== -->
+  <header class="sticky top-0 z-50 bg-[#faf6f0]/95 backdrop-blur-md border-b border-[#e5dcce] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3.5 group">
+        <div class="w-11 h-11 rounded-2xl bg-white border border-[#d9ccb9] flex items-center justify-center font-serif font-bold text-lg text-[#1d1814] shadow-sm group-hover:border-accent transition-all">
+          HP<span class="text-accent">.</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="font-serif font-bold text-lg text-[#1d1814] tracking-tight leading-none">Henil Patel</span>
+            <span class="px-2 py-0.5 rounded-full bg-[#eef6f0] text-emerald-800 border border-emerald-200 font-mono text-[9px] font-bold">ONLINE</span>
+          </div>
+          <span class="font-mono text-[11px] text-[#786b5e] tracking-wider mt-0.5 hidden sm:inline">HP.LAB // CREDENTIAL VAULT</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center gap-2 bg-[#f4eee2]/80 p-1.5 rounded-2xl border border-[#e5dcce]">
+        <a href="index.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all">
+          00 // COMMAND DECK
+        </a>
+        <a href="projects.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all">
+          01 // 3D PROJECTS LAB
+        </a>
+        <a href="certificates.html" class="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-[#1d1814] text-white shadow-sm transition-all flex items-center gap-2 relative">
+          <span class="w-2 h-2 rounded-full bg-accent"></span>
+          <span>02 // CERTIFICATE VAULT</span>
+          <span class="px-1.5 py-0.2 rounded-full bg-amber-400 text-[#1d1814] font-mono text-[10px] font-extrabold">8</span>
+        </a>
+        <a href="feedback.html" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold text-[#5c4e40] hover:text-[#1d1814] hover:bg-white/80 transition-all">
+          03 // DEFENSE &amp; REVIEWS
+        </a>
+      </nav>
+
+      <!-- Palette Switcher & Mobile Drawer -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center p-1 rounded-xl bg-white border border-[#ded4c3] shadow-sm">
+          <button type="button" data-set-theme="brass" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all bg-[#faf6f0] text-[#1d1814]">Brass</button>
+          <button type="button" data-set-theme="blueprint" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814]">Blueprint</button>
+          <button type="button" data-set-theme="verdigris" class="theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814]">Verdigris</button>
+        </div>
+
+        <button id="mobileMenuToggle" type="button" class="lg:hidden p-2.5 rounded-xl bg-white border border-[#ded4c3] text-[#1d1814]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileNavMenu" class="hidden lg:hidden border-t border-[#e5dcce] bg-[#faf6f0] px-4 py-4 space-y-2">
+      <a href="index.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce]">00 // COMMAND DECK</a>
+      <a href="projects.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce]">01 // 3D PROJECTS LAB</a>
+      <a href="certificates.html" class="block px-4 py-3 rounded-xl bg-[#1d1814] text-white font-mono text-xs font-bold flex items-center justify-between">
+        <span>02 // CERTIFICATE VAULT</span>
+        <span class="px-2 py-0.5 rounded-full bg-amber-400 text-[#1d1814] font-mono text-[10px] font-bold">8 VERIFIED</span>
+      </a>
+      <a href="feedback.html" class="block px-4 py-3 rounded-xl bg-white text-[#483d33] font-mono text-xs font-semibold border border-[#e5dcce]">03 // DEFENSE &amp; REVIEWS</a>
+    </div>
+  </header>
+
+  <!-- ==================== GRAND REFLECTOR VAULT INTRO ==================== -->
+  <main class="py-12 sm:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Header Title & Controls -->
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#d6c7b1] font-mono text-xs uppercase tracking-widest text-accent font-semibold mb-3">
+            02 // HOLOGRAPHIC REFLECTOR VAULT
+          </div>
+          <h1 class="font-serif text-3xl sm:text-5xl font-bold text-[#1d1814] tracking-tight">
+            Certified Accreditations &amp; Honors
+          </h1>
+          <p class="text-sm sm:text-base text-[#483d33] mt-2 max-w-2xl">
+            8 verified professional credentials in 3D CAD modeling, embedded programming, artificial intelligence, leadership, and national olympiads. Hover cards for 3D gyro tilt and prismatic light reflection.
+          </p>
+        </div>
+
+        <!-- Mode Toggle: 3D Reflector Grid vs 3D Coverflow Carousel -->
+        <div class="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-[#d6c7b1] shadow-xs">
+          <button
+            id="viewGridBtn"
+            type="button"
+            class="px-4 py-2 rounded-xl font-mono text-xs font-bold bg-[#1d1814] text-white transition-all shadow-xs"
+          >
+            3D Reflector Grid
+          </button>
+          <button
+            id="viewCoverflowBtn"
+            type="button"
+            class="px-4 py-2 rounded-xl font-mono text-xs font-semibold text-[#5c4e40] hover:text-[#1d1814] transition-all"
+          >
+            3D Coverflow Deck
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="flex flex-wrap items-center gap-2 mb-10 pb-4 border-b border-[#e5dcce]">
+        <button type="button" data-cert-filter="all" class="cert-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-[#1d1814] text-white shadow-xs transition-all">
+          All Credentials (8)
+        </button>
+        <button type="button" data-cert-filter="cad" class="cert-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all">
+          CAD &amp; Prototyping
+        </button>
+        <button type="button" data-cert-filter="programming" class="cert-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all">
+          C &amp; Embedded
+        </button>
+        <button type="button" data-cert-filter="ai" class="cert-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all">
+          Artificial Intelligence
+        </button>
+        <button type="button" data-cert-filter="leadership" class="cert-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all">
+          Leadership &amp; PMI
+        </button>
+        <button type="button" data-cert-filter="olympiad" class="cert-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all">
+          IIT Bombay &amp; State Honors
+        </button>
+      </div>
+
+      <!-- ==================== VIEW 1: 3D REFLECTOR GRID ==================== -->
+      <div id="gridDisplaySection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Rendered via JavaScript with 3D tilt & holographic sheen -->
+      </div>
+
+      <!-- ==================== VIEW 2: 3D COVERFLOW DECK ==================== -->
+      <div id="coverflowDisplaySection" class="hidden relative py-8">
+        <div class="coverflow-stage relative w-full h-[520px] flex items-center justify-center">
+          <div id="coverflowTrack" class="coverflow-track relative w-full h-full flex items-center justify-center">
+            <!-- Dynamic coverflow items inserted by script -->
+          </div>
+        </div>
+
+        <!-- Coverflow Navigation Controls -->
+        <div class="flex items-center justify-center gap-6 mt-8 font-mono">
+          <button
+            id="coverflowPrevBtn"
+            type="button"
+            class="p-3.5 rounded-2xl bg-white border border-[#d6c7b1] hover:border-accent text-[#1d1814] shadow-sm hover:scale-105 transition-all"
+            aria-label="Previous Certificate"
+          >
+            ← PREV
+          </button>
+
+          <span id="coverflowIndexIndicator" class="text-xs font-bold text-[#1d1814] px-4 py-2 rounded-xl bg-white border border-[#d6c7b1]">
+            1 / 8
+          </span>
+
+          <button
+            id="coverflowNextBtn"
+            type="button"
+            class="p-3.5 rounded-2xl bg-white border border-[#d6c7b1] hover:border-accent text-[#1d1814] shadow-sm hover:scale-105 transition-all"
+            aria-label="Next Certificate"
+          >
+            NEXT →
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================== 3D LIGHTBOX CERTIFICATE INSPECTION MODAL ==================== -->
+  <div id="certModal" class="fixed inset-0 z-50 bg-[#1d1814]/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-white rounded-3xl border-2 border-[#d9cdba] shadow-2xl p-6 sm:p-9">
+      <button id="closeCertModalBtn" type="button" class="absolute top-5 right-5 p-2 rounded-xl bg-[#faf6f0] text-[#1d1814] hover:bg-[#ede3d1] transition-colors">
+        ✕
+      </button>
+
+      <div class="flex items-center gap-2.5 mb-2">
+        <span id="modalIssuerBadge" class="px-3 py-1 rounded-full bg-[#faf6f0] border border-[#d6c7b1] font-mono text-[11px] text-accent font-bold">
+          ISSUER
+        </span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#eef6f0] text-emerald-800 border border-emerald-200 font-mono text-[10px] font-bold">
+          ✓ VERIFIED AUTHENTIC
+        </span>
+      </div>
+
+      <h3 id="modalCertTitle" class="font-serif text-2xl sm:text-3xl font-bold text-[#1d1814] mb-4">
+        Certificate Title
+      </h3>
+
+      <!-- High-Res Certificate Image Container -->
+      <div class="mb-6 rounded-2xl overflow-hidden border-2 border-[#e5dcce] bg-[#faf6f0] p-3 sm:p-5 flex items-center justify-center relative shadow-inner group">
+        <img id="modalCertImg" src="" alt="Certificate" class="max-h-[380px] w-auto object-contain rounded-xl shadow-md transition-transform duration-300" />
+      </div>
+
+      <!-- Credential Breakdown Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-[#faf6f0] border border-[#e5dcce] mb-6 font-mono text-xs">
+        <div>
+          <span class="text-[#786b5e] uppercase">Awarded To:</span>
+          <div id="modalCertRecipient" class="font-bold text-[#1d1814] text-sm mt-0.5">Henil Satishbhai Patel</div>
+        </div>
+        <div>
+          <span class="text-[#786b5e] uppercase">Completion Timestamp:</span>
+          <div id="modalCertDate" class="font-bold text-[#1d1814] text-sm mt-0.5">Nov 14, 2026</div>
+        </div>
+        <div class="sm:col-span-2">
+          <span class="text-[#786b5e] uppercase">Credential / Certificate ID:</span>
+          <div class="flex items-center gap-2 mt-1">
+            <input
+              id="modalCertIdInput"
+              type="text"
+              readonly
+              class="w-full px-3 py-2 rounded-xl bg-white border border-[#d9ccb9] text-[11px] font-mono text-[#1d1814] select-all"
+            />
+            <button
+              id="copyCertIdBtn"
+              type="button"
+              class="shrink-0 px-3 py-2 rounded-xl bg-[#1d1814] text-white font-mono text-xs font-bold hover:bg-[#382f26] transition-all"
+            >
+              Copy ID
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills Covered -->
+      <h4 class="font-mono text-xs uppercase font-bold text-[#1d1814] mb-2 tracking-wider">Top Engineering Skills Covered</h4>
+      <div id="modalCertSkills" class="flex flex-wrap gap-2 mb-4">
+      </div>
+
+      <p id="modalCertSignificance" class="text-xs text-[#5c4e40] leading-relaxed pt-2 border-t border-[#f0e7d9]">
+        Significance summary...
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="py-12 border-t border-[#e2d6c3] bg-[#f4eee2] transition-colors duration-300 mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-[#ded3be]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white border border-[#d9ccb9] flex items-center justify-center font-serif font-bold text-base text-[#1d1814]">
+            HP<span class="text-accent">.</span>
+          </div>
+          <div>
+            <div class="font-serif font-bold text-base text-[#1d1814]">Henil Patel</div>
+            <div class="font-mono text-xs text-[#786b5e]">Electronics Engineering &amp; Hardware Prototyping</div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-5 font-mono text-xs font-semibold text-[#483d33]">
+          <a href="index.html" class="hover:text-accent transition-colors">00 // Command Deck</a>
+          <a href="projects.html" class="hover:text-accent transition-colors">01 // 3D Projects Lab</a>
+          <a href="certificates.html" class="text-accent">02 // Certificate Vault</a>
+          <a href="feedback.html" class="hover:text-accent transition-colors">03 // Defense &amp; Reviews</a>
+        </div>
+      </div>
+
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#786b5e] font-mono">
+        <div>&copy; 2026 HENIL PATEL // HP.LAB // VINTAGE WORKSTATION EDITION</div>
+        <div>HOSTED ON LOCAL WORKSPACE // KARNAVATI UNIVERSITY</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== REFLECTOR JAVASCRIPT ENGINE ==================== -->
+  <script>
+    (function () {
+      /* 1. Theme Persistence */
+      const currentTheme = localStorage.getItem('henil_theme') || 'brass';
+      document.body.setAttribute('data-theme', currentTheme);
+
+      const themeButtons = document.querySelectorAll('[data-set-theme]');
+      function updateThemeButtons(theme) {
+        themeButtons.forEach((btn) => {
+          const t = btn.getAttribute('data-set-theme');
+          if (t === theme) {
+            btn.className = 'theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all bg-[#faf6f0] text-[#1d1814] shadow-xs';
+          } else {
+            btn.className = 'theme-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium text-[#786b5e] hover:text-[#1d1814] transition-all';
+          }
+        });
+      }
+      updateThemeButtons(currentTheme);
+
+      themeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const selected = btn.getAttribute('data-set-theme');
+          document.body.setAttribute('data-theme', selected);
+          localStorage.setItem('henil_theme', selected);
+          updateThemeButtons(selected);
+        });
+      });
+
+      /* Mobile Drawer */
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mobileNavMenu = document.getElementById('mobileNavMenu');
+      if (mobileMenuToggle && mobileNavMenu) {
+        mobileMenuToggle.addEventListener('click', () => {
+          mobileNavMenu.classList.toggle('hidden');
+        });
+      }
+
+      /* 2. All 8 Verified Certificates Data */
+      const certificates = [
+        {
+          id: 'solidworks-2024',
+          title: 'SOLIDWORKS 2024 Essential Training',
+          issuer: 'LinkedIn Learning',
+          category: 'cad',
+          categoryLabel: 'CAD & Prototyping',
+          recipient: 'HENIL SATISHBHAI PATEL',
+          date: 'Nov 14, 2026 • 10 hours',
+          certId: 'e4c2df0b1aff5445e818ab188db961387cd009c47de91424e5a73cd9599ed5a7',
+          skills: ['SOLIDWORKS', '3D CAD Modeling', 'Parametric Design', 'Mechanical Assemblies'],
+          image: 'assets/certificates/solidworks-essential-2024.jpg',
+          significance: 'Core mechanical modeling credential validating parametric sketches, feature creation, multi-part assembly mates, and tolerance analysis used in the Ceiling Fan Cleaning Robot.'
+        },
+        {
+          id: 'c-programming',
+          title: 'Complete Guide to C Programming Foundations',
+          issuer: 'LinkedIn Learning',
+          category: 'programming',
+          categoryLabel: 'C & Embedded',
+          recipient: 'HENIL SATISHBHAI PATEL',
+          date: 'Nov 14, 2026 • 5 hours 52 mins',
+          certId: 'e8b17a45e2d224de574a08e51db5a2a1caa1ca58858fe98163e08af7fecd9758',
+          skills: ['C (Programming Language)', 'Programming Foundations', 'Memory Management', 'Pointers'],
+          image: 'assets/certificates/c-programming-foundations.jpg',
+          significance: 'Fundamental embedded systems software credential covering pointer arithmetic, struct memory layout, bitwise manipulation, and deterministic microcontroller architecture.'
+        },
+        {
+          id: 'ai-foundations',
+          title: 'Artificial Intelligence Foundations: Thinking Machines',
+          issuer: 'LinkedIn Learning',
+          category: 'ai',
+          categoryLabel: 'Artificial Intelligence',
+          recipient: 'HENIL SATISHBHAI PATEL',
+          date: 'Nov 14, 2026 • 1 hour 36 mins',
+          certId: 'a077482cef64380d734b17787d870837df4fb13f14ad9d5bae344eb9b17c8eaa',
+          skills: ['Machine Learning', 'Artificial Intelligence (AI)', 'Thinking Machines', 'Algorithm Foundations'],
+          image: 'assets/certificates/ai-foundations-thinking-machines.jpg',
+          significance: 'Explores cognitive computing paradigms, neural search, and machine learning models applicable to autonomous hardware edge robotics.'
+        },
+        {
+          id: 'leadership-feedback',
+          title: 'Leadership through Feedback',
+          issuer: 'LinkedIn Learning',
+          category: 'leadership',
+          categoryLabel: 'Leadership & Professional',
+          recipient: 'HENIL SATISHBHAI PATEL',
+          date: 'Nov 14, 2026 • 1 hour 21 mins',
+          certId: 'c0d5a5ebb1c034f04492a0125abbc90e1bec2996015152e4cebbe18487d587ce',
+          skills: ['Constructive Feedback', 'Engineering Team Dynamics', 'Technical Leadership'],
+          image: 'assets/certificates/leadership-through-feedback.jpg',
+          significance: 'Leadership frameworks for peer design reviews, agile sprint retrospectives, and cross-functional hardware/software engineering team collaboration.'
+        },
+        {
+          id: 'leadership-pmi',
+          title: 'Leadership through Feedback (PMI Registered Partner)',
+          issuer: 'Project Management Institute (PMI)',
+          category: 'leadership',
+          categoryLabel: 'Leadership & PMI',
+          recipient: 'HENIL SATISHBHAI PATEL',
+          date: 'Nov 14, 2026 • 1.25 PDUs / Contact Hours',
+          certId: '6b986ee93aed4aa536a7b845283070082e6742b556a897fdf1e474e86d7cbef4',
+          skills: ['Project Leadership', '1.25 Contact Hours', 'PMI Authorized', 'Constructive Feedback'],
+          image: 'assets/certificates/leadership-feedback-pmi.jpg',
+          significance: 'Accredited with PMI Provider #4101 (Activity #: 4101143NNS) demonstrating formalized professional project leadership and industry-grade communication skills.'
+        },
+        {
+          id: 'jiopc-ai-classroom',
+          title: 'AI Classroom - AI Foundation Course',
+          issuer: 'Jio Institute & JioPC',
+          category: 'ai',
+          categoryLabel: 'Artificial Intelligence',
+          recipient: 'Henil Satishbhai Patel',
+          date: 'Certified Academic Trainee',
+          certId: '6FeQV1j5AM9L',
+          skills: ['AI Foundation', 'JioPC Intelligence', 'Machine Learning Basics', 'Data Analysis'],
+          image: 'assets/certificates/jiopc-ai-classroom.jpg',
+          significance: 'Comprehensive foundational artificial intelligence course designed by Jio Institute covering practical computing concepts and predictive data structures.'
+        },
+        {
+          id: 'iit-bombay-iento',
+          title: 'IEntO 2025 - International Entrepreneurship Olympiad',
+          issuer: 'The Entrepreneurship Cell (E-Cell), IIT Bombay',
+          category: 'olympiad',
+          categoryLabel: 'IIT Bombay & State Honors',
+          recipient: 'Henil Patel',
+          date: 'Official Olympiad Delegate • 2025',
+          certId: 'Team E-Cell IIT Bombay (Signed: Ayush Tekriwal & Prathamesh Yeole)',
+          skills: ['Entrepreneurial Innovation', 'Problem-Solving', 'Business Challenges', 'Engineering Strategy'],
+          image: 'assets/certificates/iit-bombay-iento-2025.jpg',
+          significance: 'International platform hosted by IIT Bombay acknowledging Henil Patel\'s global problem-solving capabilities, technological innovation, and engineering entrepreneurship.'
+        },
+        {
+          id: 'g3q-quiz',
+          title: 'Certificate of Participation - Gujarat Gyan Guru Quiz (G3Q) 3.0',
+          issuer: 'Education Department, Government of Gujarat',
+          category: 'olympiad',
+          categoryLabel: 'IIT Bombay & State Honors',
+          recipient: 'PATEL HENIL (Karnavati University)',
+          date: '08 Oct 2026 • Week 3',
+          certId: 'G3QC3081020268520',
+          skills: ['College / University Category', 'General Engineering Knowledge', 'Gujarat State Honor'],
+          image: 'assets/certificates/gujarat-gyan-guru-quiz-g3q.jpg',
+          significance: 'Conducted under Hon\'ble Minister Dr. Pradhyumn Vaja and Minister of State Shri Trikambhai Chhanga, recognizing high academic aptitude at university level.'
+        }
+      ];
+
+      /* 3. Render 3D Reflector Grid */
+      const gridDisplaySection = document.getElementById('gridDisplaySection');
+
+      function renderGrid(filter = 'all') {
+        const filtered = filter === 'all' ? certificates : certificates.filter(c => c.category === filter);
+        gridDisplaySection.innerHTML = filtered.map(cert => `
+          <div class="reflector-stage">
+            <div
+              class="reflector-card-container vintage-card rounded-3xl p-6 bg-white relative overflow-hidden group cursor-pointer border-2 hover:border-accent"
+              data-inspect-id="${cert.id}"
+            >
+              <!-- Holographic Reflector Sheen Layer -->
+              <div class="reflector-foil ambient-foil"></div>
+
+              <!-- Top Calibrated Badge -->
+              <div class="flex items-center justify-between gap-2 mb-4">
+                <span class="px-2.5 py-1 rounded-full bg-[#faf6f0] border border-[#d6c7b1] font-mono text-[10px] font-bold text-accent">
+                  ${cert.issuer}
+                </span>
+                <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-emerald-800 bg-[#eef6f0] px-2 py-0.5 rounded-md border border-emerald-200">
+                  <span>✓</span> VERIFIED
+                </span>
+              </div>
+
+              <!-- Certificate Preview Image with Embossed Shadow -->
+              <div class="relative w-full h-48 rounded-2xl overflow-hidden bg-[#faf6f0] border border-[#e5dcce] p-2 flex items-center justify-center mb-5 shadow-inner">
+                <img
+                  src="${cert.image}"
+                  alt="${cert.title}"
+                  class="max-h-full max-w-full object-contain rounded-lg drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+
+              <!-- Title & Meta -->
+              <h3 class="font-serif text-lg font-bold text-[#1d1814] mb-2 group-hover:text-accent transition-colors line-clamp-2">
+                ${cert.title}
+              </h3>
+              <p class="font-mono text-xs text-[#786b5e] mb-4">
+                ${cert.date}
+              </p>
+
+              <!-- Skills Tags -->
+              <div class="flex flex-wrap gap-1.5 mb-5">
+                ${cert.skills.slice(0, 3).map(s => `
+                  <span class="px-2 py-0.5 rounded-md bg-[#faf6f0] border border-[#e5dcce] font-mono text-[10px] text-[#483d33]">
+                    ${s}
+                  </span>
+                `).join('')}
+              </div>
+
+              <!-- Inspect Action Pill -->
+              <div class="pt-3 border-t border-[#f0e7d9] flex items-center justify-between font-mono text-xs font-bold text-[#1d1814] group-hover:text-accent">
+                <span>INSPECT CREDENTIAL</span>
+                <span class="transition-transform group-hover:translate-x-1">→</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        attachTiltPhysics();
+        attachInspectListeners();
+      }
+
+      /* 4. 3D Tilt & Holographic Foil Physics on Mouse Move */
+      function attachTiltPhysics() {
+        const containers = document.querySelectorAll('.reflector-card-container');
+        containers.forEach(container => {
+          container.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const normX = (x / rect.width) - 0.5;
+            const normY = (y / rect.height) - 0.5;
+
+            const rotY = normX * 18;
+            const rotX = -normY * 18;
+
+            container.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale(1.02)`;
+
+            // Move the holographic light gradient across card
+            const foil = container.querySelector('.reflector-foil');
+            if (foil) {
+              const bgPosX = ((normX + 0.5) * 100);
+              const bgPosY = ((normY + 0.5) * 100);
+              foil.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
+            }
+          });
+
+          container.addEventListener('mouseleave', () => {
+            container.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+          });
+        });
+      }
+
+      /* 5. 3D Coverflow Deck Logic */
+      const coverflowTrack = document.getElementById('coverflowTrack');
+      const coverflowIndexIndicator = document.getElementById('coverflowIndexIndicator');
+      let currentCoverflowIndex = 0;
+
+      function renderCoverflow() {
+        coverflowTrack.innerHTML = certificates.map((cert, idx) => `
+          <div
+            class="coverflow-item w-[320px] sm:w-[420px] p-6 vintage-card rounded-3xl bg-white border-2 border-[#d6c7b1] shadow-2xl cursor-pointer"
+            data-index="${idx}"
+            data-inspect-id="${cert.id}"
+          >
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2.5 py-1 rounded-full bg-[#faf6f0] border border-[#d6c7b1] font-mono text-[10px] font-bold text-accent">
+                ${cert.issuer}
+              </span>
+              <span class="text-xs font-mono font-bold text-[#1d1814]">${idx + 1} / 8</span>
+            </div>
+            <div class="h-56 bg-[#faf6f0] rounded-2xl border border-[#e5dcce] p-3 flex items-center justify-center mb-4">
+              <img src="${cert.image}" alt="${cert.title}" class="max-h-full max-w-full object-contain rounded-lg drop-shadow" />
+            </div>
+            <h3 class="font-serif text-lg font-bold text-[#1d1814] mb-1 truncate">${cert.title}</h3>
+            <p class="font-mono text-xs text-[#786b5e] mb-3">${cert.date}</p>
+            <div class="pt-3 border-t border-[#f0e7d9] flex items-center justify-between font-mono text-xs font-bold text-accent">
+              <span>CLICK TO ZOOM &amp; INSPECT</span>
+              <span>🔍</span>
+            </div>
+          </div>
+        `).join('');
+
+        updateCoverflowLayout();
+        attachInspectListeners();
+      }
+
+      function updateCoverflowLayout() {
+        const items = document.querySelectorAll('.coverflow-item');
+        coverflowIndexIndicator.textContent = `${currentCoverflowIndex + 1} / ${certificates.length}`;
+
+        items.forEach((item, idx) => {
+          const offset = idx - currentCoverflowIndex;
+          if (offset === 0) {
+            item.style.transform = `translateX(0px) translateZ(120px) rotateY(0deg) scale(1)`;
+            item.style.opacity = '1';
+            item.style.zIndex = '30';
+          } else if (offset < 0) {
+            const dist = Math.abs(offset);
+            item.style.transform = `translateX(${offset * 140}px) translateZ(${120 - dist * 90}px) rotateY(${Math.min(dist * 22, 65)}deg) scale(${Math.max(0.7, 1 - dist * 0.12)})`;
+            item.style.opacity = dist > 2 ? '0' : '0.65';
+            item.style.zIndex = `${30 - dist}`;
+          } else {
+            const dist = offset;
+            item.style.transform = `translateX(${offset * 140}px) translateZ(${120 - dist * 90}px) rotateY(-${Math.min(dist * 22, 65)}deg) scale(${Math.max(0.7, 1 - dist * 0.12)})`;
+            item.style.opacity = dist > 2 ? '0' : '0.65';
+            item.style.zIndex = `${30 - dist}`;
+          }
+        });
+      }
+
+      const coverflowPrevBtn = document.getElementById('coverflowPrevBtn');
+      const coverflowNextBtn = document.getElementById('coverflowNextBtn');
+      if (coverflowPrevBtn && coverflowNextBtn) {
+        coverflowPrevBtn.addEventListener('click', () => {
+          if (currentCoverflowIndex > 0) {
+            currentCoverflowIndex--;
+            updateCoverflowLayout();
+          }
+        });
+        coverflowNextBtn.addEventListener('click', () => {
+          if (currentCoverflowIndex < certificates.length - 1) {
+            currentCoverflowIndex++;
+            updateCoverflowLayout();
+          }
+        });
+      }
+
+      /* 6. Mode Switch: Grid vs Coverflow */
+      const viewGridBtn = document.getElementById('viewGridBtn');
+      const viewCoverflowBtn = document.getElementById('viewCoverflowBtn');
+      const coverflowDisplaySection = document.getElementById('coverflowDisplaySection');
+
+      viewGridBtn.addEventListener('click', () => {
+        viewGridBtn.className = 'px-4 py-2 rounded-xl font-mono text-xs font-bold bg-[#1d1814] text-white transition-all shadow-xs';
+        viewCoverflowBtn.className = 'px-4 py-2 rounded-xl font-mono text-xs font-semibold text-[#5c4e40] hover:text-[#1d1814] transition-all';
+        gridDisplaySection.classList.remove('hidden');
+        coverflowDisplaySection.classList.add('hidden');
+      });
+
+      viewCoverflowBtn.addEventListener('click', () => {
+        viewCoverflowBtn.className = 'px-4 py-2 rounded-xl font-mono text-xs font-bold bg-[#1d1814] text-white transition-all shadow-xs';
+        viewGridBtn.className = 'px-4 py-2 rounded-xl font-mono text-xs font-semibold text-[#5c4e40] hover:text-[#1d1814] transition-all';
+        gridDisplaySection.classList.add('hidden');
+        coverflowDisplaySection.classList.remove('hidden');
+        renderCoverflow();
+      });
+
+      /* 7. Filtering */
+      const certFilterBtns = document.querySelectorAll('.cert-filter-btn');
+      certFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filter = btn.getAttribute('data-cert-filter');
+          certFilterBtns.forEach(b => {
+            b.className = 'cert-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#483d33] border border-[#d6c7b1] hover:border-accent transition-all';
+          });
+          btn.className = 'cert-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-[#1d1814] text-white shadow-xs transition-all';
+          renderGrid(filter);
+        });
+      });
+
+      /* 8. Lightbox Inspection Modal */
+      const certModal = document.getElementById('certModal');
+      const closeCertModalBtn = document.getElementById('closeCertModalBtn');
+      const modalIssuerBadge = document.getElementById('modalIssuerBadge');
+      const modalCertTitle = document.getElementById('modalCertTitle');
+      const modalCertImg = document.getElementById('modalCertImg');
+      const modalCertRecipient = document.getElementById('modalCertRecipient');
+      const modalCertDate = document.getElementById('modalCertDate');
+      const modalCertIdInput = document.getElementById('modalCertIdInput');
+      const modalCertSkills = document.getElementById('modalCertSkills');
+      const modalCertSignificance = document.getElementById('modalCertSignificance');
+      const copyCertIdBtn = document.getElementById('copyCertIdBtn');
+
+      function openCertModal(cert) {
+        modalIssuerBadge.textContent = cert.issuer;
+        modalCertTitle.textContent = cert.title;
+        modalCertImg.src = cert.image;
+        modalCertRecipient.textContent = cert.recipient;
+        modalCertDate.textContent = cert.date;
+        modalCertIdInput.value = cert.certId;
+        modalCertSkills.innerHTML = cert.skills.map(s => `
+          <span class="px-3 py-1 rounded-xl bg-white border border-[#d6c7b1] font-mono text-xs text-[#1d1814]">
+            ${s}
+          </span>
+        `).join('');
+        modalCertSignificance.textContent = cert.significance;
+
+        certModal.classList.remove('hidden');
+        certModal.classList.add('flex');
+      }
+
+      function closeCertModal() {
+        certModal.classList.add('hidden');
+        certModal.classList.remove('flex');
+      }
+
+      closeCertModalBtn.addEventListener('click', closeCertModal);
+      certModal.addEventListener('click', (e) => {
+        if (e.target === certModal) closeCertModal();
+      });
+
+      copyCertIdBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(modalCertIdInput.value);
+        copyCertIdBtn.textContent = 'Copied!';
+        setTimeout(() => { copyCertIdBtn.textContent = 'Copy ID'; }, 2000);
+      });
+
+      function attachInspectListeners() {
+        document.querySelectorAll('[data-inspect-id]').forEach(el => {
+          el.addEventListener('click', () => {
+            const id = el.getAttribute('data-inspect-id');
+            const cert = certificates.find(c => c.id === id);
+            if (cert) openCertModal(cert);
+          });
+        });
+      }
+
+      // Initial Render
+      renderGrid('all');
+
+    })();
+  </script>
+</body>
+</html>
